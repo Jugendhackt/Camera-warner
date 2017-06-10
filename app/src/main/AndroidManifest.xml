@@ -16,7 +16,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MapsActivity"
+            android:label="@string/title_activity_maps">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -36,19 +37,12 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".MapsActivity"
-            android:label="@string/title_activity_maps">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.jugendhackt.camera_warner.MainActivity" />
-        </activity>
-        <activity
             android:name=".EinstellungenActivity"
             android:label="@string/title_activity_einstellungen"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MapsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.jugendhackt.camera_warner.EinstellungenActivity" />
+                android:value="org.jugendhackt.camera_warner.MapsActivity" />
         </activity>
     </application>
 
