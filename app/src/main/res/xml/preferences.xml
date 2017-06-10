@@ -2,10 +2,15 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <EditTextPreference
-        android:key="pref_sync"
+        android:key="pref_radius"
         android:title="Radius"
         android:summary="3 Meter ungenauigkeit"
         android:defaultValue="3" />
+    <SwitchPreference
+        android:key="pref_warning"
+        android:title="Suche"
+        android:summary="Wenn Aktiv: sucht nach kameras"
+        android:defaultValue="false" />
 
 
 </PreferenceScreen>
