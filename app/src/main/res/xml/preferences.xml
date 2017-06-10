@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <EditTextPreference
-        android:key="pref_radius"
-        android:title="Radius"
-        android:summary="10 Meter ungenauigkeit"
-        android:defaultValue="3" />
+        android:key="@string/pref_radius_key"
+        android:title="@string/pref_radius_label"
+        tools:summary="Set the size of the radius"
+        android:defaultValue="@integer/pref_radius_default" />
+
     <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="pref_warning"
-        android:summary="Wenn Aktiv: sucht nach kameras"
-        android:title="Suche" />
+        android:defaultValue="@bool/pref_active_default"
+        android:key="@string/pref_active_key"
+        android:summaryOn="@string/pref_active_summary_on"
+        android:summaryOff="@string/pref_active_summary_off"
+        android:title="@string/pref_active_label" />
+
     <Preference
-        android:title="Anmelden"
-        android:key ="pref_anmelden"/>
+        android:enabled="false"
+        android:title="@string/pref_login_label"
+        android:key ="@string/pref_login_key"/>
 
 </PreferenceScreen>

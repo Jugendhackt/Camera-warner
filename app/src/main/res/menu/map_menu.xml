@@ -11,8 +11,5 @@
         android:id="@+id/action_add"
         android:orderInCategory="15"
         app:showAsAction="ifRoom"
-        android:title="add a new camera"
-        />
-
-
+        android:title="add a new camera" />
 </menu>

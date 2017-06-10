@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">"Camera-warner "</string>
+    <string name="app_name">Camera-warner</string>
     <string name="title_activity_maps">Map</string>
-    <string name="title_activity_einstellungen">Einstellungen</string>
+    <string name="title_activity_settings">Einstellungen</string>
     <string name="title_activity_login">Anmelden</string>
 
     <!-- Strings related to login -->
@@ -16,6 +16,18 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+
     <string name="broadcast_camera">org.jugendhackt.camera_warner.cameras</string>
     <string name="broadcast_location">org.jugendhackt.camera_warner.location</string>
+
+    <string name="pref_radius_key">pref_radius</string>
+    <string name="pref_radius_label">Radius</string>
+
+    <string name="pref_active_key">pref_active</string>
+    <string name="pref_active_label">Send Notifications</string>
+    <string name="pref_active_summary_off">You wont be notified if you\'re near a camera</string>
+    <string name="pref_active_summary_on">Notifications will be sent if you\'re near a camera</string>
+
+    <string name="pref_login_key">pref_login</string>
+    <string name="pref_login_label">Anmelden</string>
 </resources>
