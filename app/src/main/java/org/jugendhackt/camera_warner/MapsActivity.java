@@ -1,66 +1,38 @@
 package org.jugendhackt.camera_warner;
 
 
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
-
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
 import android.support.annotation.NonNull;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.jugendhackt.camera_warner.Data.Camera;
-import org.jugendhackt.camera_warner.Data.DataProvider;
-import org.jugendhackt.camera_warner.Data.DatabaseDataProvider;
-import org.jugendhackt.camera_warner.Data.JuvenalDataProvider;
-import org.jugendhackt.camera_warner.Utils.NetworkUtils;
 
 import java.util.List;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback{
 
     private GoogleMap mMap;
-    private FusedLocationProviderClient mClient;
     static String TAG = "MapsActivity";
-    private LocationCallback callback;
 
     private Marker lastMarker;
-    static int INTERVAL = 1000 * 30;
-    static int FASTEST_INTERVAL = 1000 * 15;
 
     private BroadcastReceiver receiver;
     private BroadcastReceiver receiver1;
