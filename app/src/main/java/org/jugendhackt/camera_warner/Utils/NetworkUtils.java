@@ -32,10 +32,13 @@ import java.util.Scanner;
  */
 public class NetworkUtils {
 
+    //TODO: Datenbankzugriff in Klassen verpacken, siehe DataProvider
+
     final static String GITHUB_BASE_URL =
-            "http://172.16.107.61/phptest.php";
+            "http://172.16.107.61/cameras.php";
 
 
+    //TODO: Kommentare anpassen
     /**
      * Builds the URL used to query GitHub.
      *
