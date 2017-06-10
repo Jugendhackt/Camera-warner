@@ -12,8 +12,8 @@ public interface DataProvider {
 
     List<Camera> getAllCameras();
 
-    List<Camera> getNearestCamera(long latitude, long longitude);
+    List<Camera> getNearestCamera(double latitude, double longitude);
 
-    List<Camera> getCamerasInRange(long latitude, long longitude, int radius);
+    List<Camera> getCamerasInRange(double latitude, double longitude, int radius);
 
 }

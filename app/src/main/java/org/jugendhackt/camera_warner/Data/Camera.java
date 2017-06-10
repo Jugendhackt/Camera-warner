@@ -6,13 +6,13 @@ package org.jugendhackt.camera_warner.Data;
 
 public class Camera {
 
-    private long latitude;
-    private long longitude;
+    private double latitude;
+    private double longitude;
 
     private boolean hasDirection;
     private int direction;
 
-    public Camera(long latitude, long longitude, int direction)
+    public Camera(double latitude, double longitude, int direction)
     {
         this.latitude = latitude;
         this.longitude = longitude;
@@ -21,7 +21,7 @@ public class Camera {
         hasDirection = true;
     }
 
-    public Camera(long latitude, long longitude)
+    public Camera(double latitude, double longitude)
     {
         this.latitude = latitude;
         this.longitude = longitude;
@@ -29,12 +29,12 @@ public class Camera {
         hasDirection = false;
     }
 
-    public long getLatitude()
+    public double getLatitude()
     {
         return latitude;
     }
 
-    public long getLongitude()
+    public double getLongitude()
     {
         return longitude;
     }
