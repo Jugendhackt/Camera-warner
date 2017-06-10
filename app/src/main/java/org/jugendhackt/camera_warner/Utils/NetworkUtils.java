@@ -16,16 +16,17 @@
 package org.jugendhackt.camera_warner.Utils;
 
 import android.net.Uri;
-import android.util.Log;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 
 /**
  * These utilities will be used to communicate with the network.
@@ -36,6 +37,7 @@ public class NetworkUtils {
 
     final static String GITHUB_BASE_URL =
             "http://172.16.107.61/cameras.php";
+    final static String JUVENAL = "http://www.juvenal.org/api/cameras";
 
 
     //TODO: Kommentare anpassen
@@ -56,6 +58,23 @@ public class NetworkUtils {
         }
 
         return url;
+    }
+
+    public static String juvenalRequest()
+    {
+        OkHttpClient client = new OkHttpClient();
+        okhttp3.Request request = new okhttp3.Request.Builder()
+                .url(JUVENAL)
+                .header("Accept", "application/vnd.geo+json")
+                .build();
+
+        String returnVale = null;
+        try {
+            returnVale =  client.newCall(request).execute().body().string();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return returnVale;
     }
 
     /**

@@ -1,6 +1,4 @@
-package org.jugendhackt.camera_warner.Utils;
-
-import org.jugendhackt.camera_warner.Data.Camera;
+package org.jugendhackt.camera_warner.Data;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -22,6 +20,11 @@ public class FakeCameraProvider implements DataProvider{
     @Override
     public Camera getNearestCamera(double latitude, double longitude) {
         return cameras[1];
+    }
+
+    @Override
+    public float distanceToNearestCamera(double latitude, double longitude) {
+        return 42;
     }
 
     @Override

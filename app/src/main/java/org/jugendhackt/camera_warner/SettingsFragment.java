@@ -13,7 +13,7 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.widget.Toast;
 
-public class EinstellungenActivity extends PreferenceFragmentCompat
+public class SettingsFragment extends PreferenceFragmentCompat
         implements Preference.OnPreferenceChangeListener {
 
     @Override
