@@ -25,6 +25,7 @@ import org.jugendhackt.camera_warner.Data.DatabaseDataProvider;
 import org.jugendhackt.camera_warner.Data.JuvenalDataProvider;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -42,7 +43,7 @@ public class LocationService extends Service {
     private Location lastLocation;
 
     private DataProvider provider;
-    private List<Camera> allCamerasCache;
+    private List<Camera> allCamerasCache = new LinkedList<>();
 
     @Override
     public void onCreate() {
@@ -59,7 +60,7 @@ public class LocationService extends Service {
                 sendLastLocationToActivity();
 
                 if (allCamerasCache != null) {
-                    if(provider.distanceToNearestCamera(lastLocation.getLatitude(), lastLocation.getLongitude()) < Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("pref_radius", "100")))
+                    if(provider.distanceToNearestCamera(lastLocation.getLatitude(), lastLocation.getLongitude()) < Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default))))
                     {
                         Log.e(TAG, "a camera is to near");
                     }
