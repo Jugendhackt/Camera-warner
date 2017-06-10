@@ -106,7 +106,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 startActivity(mapsActivity);
                 return true;
             case R.id.action_add:
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://172.16.107.61/neuekamera.html"));
                 startActivity(browserIntent);
         }
 
