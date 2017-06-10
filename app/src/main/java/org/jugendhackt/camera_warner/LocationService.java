@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.support.annotation.Nullable;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -22,6 +23,7 @@ import org.jugendhackt.camera_warner.Data.Camera;
 import org.jugendhackt.camera_warner.Data.DataProvider;
 import org.jugendhackt.camera_warner.Data.DatabaseDataProvider;
 import org.jugendhackt.camera_warner.Data.JuvenalDataProvider;
+import org.jugendhackt.camera_warner.Utils.LocationUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,25 +58,15 @@ public class LocationService extends Service {
                 lastLocation = locationResult.getLastLocation();
 
                 sendLastLocationToActivity();
+
+                if (allCamerasCache != null) {
+                    if(provider.distanceToNearestCamera(lastLocation.getLatitude(), lastLocation.getLongitude()) < Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("pref_radius", "100")))
+                    {
+                        Log.e(TAG, "a camera is to near");
+                    }
+                }
             }
         };
-
-        LocationRequest request = new LocationRequest()
-                .setInterval(INTERVAL)
-                .setFastestInterval(FASTEST_INTERVAL)
-                .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-
-        mClient.requestLocationUpdates(request, callback, null);
-
-        mClient.getLastLocation()
-                .addOnSuccessListener(new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if (location != null) {
-                            lastLocation = location;
-                        }
-                    }
-                });
 
         provider = new JuvenalDataProvider();
     }
