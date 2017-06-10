@@ -1,5 +1,7 @@
 package org.jugendhackt.camera_warner;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -178,7 +180,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
 
-        lastMarker = mMap.addMarker(new MarkerOptions().position(userLocation).title("Your location"));
+        lastMarker = mMap.addMarker(new MarkerOptions().position(userLocation).title("Your location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
     }
 
     /**
