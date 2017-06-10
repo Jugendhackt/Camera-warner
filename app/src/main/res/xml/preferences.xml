@@ -4,13 +4,13 @@
     <EditTextPreference
         android:key="pref_radius"
         android:title="Radius"
-        android:summary="3 Meter ungenauigkeit"
+        android:summary="10 Meter ungenauigkeit"
         android:defaultValue="3" />
     <CheckBoxPreference
+        android:defaultValue="true"
         android:key="pref_warning"
-        android:title="Suche"
         android:summary="Wenn Aktiv: sucht nach kameras"
-        android:defaultValue="true" />
+        android:title="Suche" />
     <Preference
         android:title="Anmelden"
         android:key ="pref_anmelden"/>

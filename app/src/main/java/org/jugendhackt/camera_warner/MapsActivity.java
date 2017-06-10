@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -149,6 +150,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             case R.id.action_settings:
                 Intent mapsActivity = new Intent(this, SettingsActivity.class);
                 startActivity(mapsActivity);
+                return true;
+            case R.id.action_add:
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"));
+                startActivity(browserIntent);
         }
 
         return super.onOptionsItemSelected(item);
