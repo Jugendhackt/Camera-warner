@@ -30,4 +30,7 @@
 
     <string name="pref_login_key">pref_login</string>
     <string name="pref_login_label">Anmelden</string>
+
+    <string name="action_settings" >@string/title_activity_settings</string>
+    <string name="action_add_camera" >Add a new Camera</string>
 </resources>

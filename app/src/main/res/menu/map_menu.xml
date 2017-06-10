@@ -5,11 +5,11 @@
         android:id="@+id/action_settings"
         android:orderInCategory="10"
         app:showAsAction="ifRoom"
-        android:title="Settings"
+        android:title="@string/action_settings"
         android:icon="@drawable/ic_settings_white_24dp" />
     <item
         android:id="@+id/action_add"
         android:orderInCategory="15"
         app:showAsAction="ifRoom"
-        android:title="add a new camera" />
+        android:title="@string/action_add_camera" />
 </menu>
