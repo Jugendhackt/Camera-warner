@@ -1,11 +1,15 @@
 package org.jugendhackt.camera_warner;
 
+<<<<<<< HEAD
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+=======
+import android.content.*;
+>>>>>>> 61b3a16abdfc50a4412fa5473d136976938d2ba8
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -46,8 +50,7 @@ import org.jugendhackt.camera_warner.Utils.NetworkUtils;
 
 import java.util.List;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
-        LoaderManager.LoaderCallbacks<List<Camera>> {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback{
 
     private GoogleMap mMap;
     private FusedLocationProviderClient mClient;
@@ -58,50 +61,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     static int INTERVAL = 1000 * 30;
     static int FASTEST_INTERVAL = 1000 * 15;
 
-    private static final int SQL_SEARCH_LOADER = 22;
+    private BroadcastReceiver receiver;
+    private BroadcastReceiver receiver1;
 
-    class IncomingHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 12:
-                    Log.d(TAG, "callback");
-                    break;
-                default:
-                    super.handleMessage(msg);
-            }
-        }
-    }
-
-    private Messenger myService;
-    private boolean bound = false;
-    private ServiceConnection serviceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            // cast the IBinder and get MyService instance
-            myService = new Messenger(service);
-            Log.d(TAG, "conncted");
-
-            try {
-                myService.send(Message.obtain(null, 13, this.hashCode(), 0));
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-
-            bound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            bound = false;
-        }
-    };
-
-    private void attachCallback() {
-        Intent intent = new Intent(MapsActivity.this, LocationCallback.class);
-
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    @Override
+    protected void onStop() {
+        unregisterReceiver(receiver);
+        super.onStop();
     }
 
     @Override
@@ -113,28 +79,33 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        mClient = LocationServices.getFusedLocationProviderClient(this);
-
-        callback = new LocationCallback() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(getResources().getString(R.string.broadcast_camera));
+        receiver = new android.content.BroadcastReceiver() {
             @Override
-            public void onLocationResult(LocationResult locationResult) {
-                Location location = locationResult.getLastLocation();
+            public void onReceive(Context context, Intent intent) {
+                Log.d(TAG, "received Cameras");
+                addData(intent.<Camera>getParcelableArrayListExtra("list"));
+            }
+        };
+        this.registerReceiver(receiver, filter);
+
+        IntentFilter filter1 = new IntentFilter();
+        filter1.addAction(getResources().getString(R.string.broadcast_location));
+        receiver1 = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(TAG, "recived Location");
+                Location location = new Location("");
+                location.setLatitude(intent.getDoubleExtra("latitude", 0));
+                location.setLongitude(intent.getDoubleExtra("longitude", 0));
                 updateLocationOnMap(location);
             }
         };
-        LocationRequest request = new LocationRequest()
-                .setInterval(INTERVAL)
-                .setFastestInterval(FASTEST_INTERVAL)
-                .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        this.registerReceiver(receiver1, filter1);
 
-        mClient.requestLocationUpdates(request, callback, null);
-
-        /*
-         * Initialize the loader
-         */
-        getSupportLoaderManager().initLoader(SQL_SEARCH_LOADER, null, this);
-
-        attachCallback();
+        Intent intent = new Intent(this, LocationService.class);
+        startService(intent);
     }
 
     @Override
@@ -195,71 +166,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        mClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if (location != null) {
-                            updateLocationOnMap(location);
-                        }
-                    }
-                });
-    }
-
-    @Override
-    public Loader<List<Camera>> onCreateLoader(int id, Bundle args) {
-        return new AsyncTaskLoader<List<Camera>>(this) {
-            List<Camera> queryResult;
-
-            @Override
-            public void deliverResult(List<Camera> data) {
-                queryResult = data;
-                super.deliverResult(data);
-            }
-
-            @Override
-            protected void onStartLoading() {
-                if (queryResult != null) {
-                    deliverResult(queryResult);
-                } else {
-                    forceLoad();
-                }
-            }
-
-            @Override
-            public List<Camera> loadInBackground() {
-                //DataProvider provider = new DatabaseDataProvider();
-                DataProvider provider = new JuvenalDataProvider();
-
-                return provider.getAllCameras();
-            }
-        };
-    }
-
-    @Override
-    public void onLoadFinished(Loader<List<Camera>> loader, List<Camera> data) {
-        if (null == data) {
-            showErrorMessage();
-        } else {
-            addData(data);
-        }
-
     }
 
     private void addData(List<Camera> data) {
         for (Camera camera : data) {
             addCamera(camera);
         }
-
-    }
-
-    private void showErrorMessage() {
-        Toast.makeText(this, "Failed to fetch data", Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<Camera>> loader) {
-
     }
 }

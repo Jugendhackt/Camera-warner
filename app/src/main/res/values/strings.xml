@@ -16,4 +16,6 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="broadcast_camera">org.jugendhackt.camera_warner.cameras</string>
+    <string name="broadcast_location">org.jugendhackt.camera_warner.location</string>
 </resources>
