@@ -17,14 +17,17 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
 import android.widget.Toast;
 
+/**
+ * This Fragment class implements the setting's custom logic (e.g. check data for validity and set preference summaries)
+ */
 public class SettingsFragment extends PreferenceFragmentCompat
         implements Preference.OnPreferenceChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
-
-    //TODO: add (proper) documentation
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //register to receive callbacks if any SharedPreference changes so that the summary can be updated
         getPreferenceScreen().getSharedPreferences()
                 .registerOnSharedPreferenceChangeListener(this);
     }
@@ -32,9 +35,11 @@ public class SettingsFragment extends PreferenceFragmentCompat
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
 
-        // Add visualizer preferences, defined in the XML file in res->xml->pref_visualizer
+        // Add preferences, defined in the XML file in res->xml->preferences.xml
         addPreferencesFromResource(R.xml.preferences);
 
+        //use Preference element as button; attaching onClick listener here
+        //note: the button is currently disabled
         Preference Button = findPreference(getString(R.string.pref_login_key));
         Button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -47,10 +52,10 @@ public class SettingsFragment extends PreferenceFragmentCompat
         });
 
 
+        //set the summaries for the different preferences for the first time
         SharedPreferences sharedPreferences = getPreferenceScreen().getSharedPreferences();
         PreferenceScreen prefScreen = getPreferenceScreen();
         int count = prefScreen.getPreferenceCount();
-
         for (int i = 0; i < count; i++) {
             Preference p = prefScreen.getPreference(i);
             // You don't need to set up preference summaries for checkbox preferences because
@@ -61,15 +66,21 @@ public class SettingsFragment extends PreferenceFragmentCompat
             }
         }
 
+        //attach listener to check for changes in the radius preference
+        //because it should only contain only doubles and the code has to enforce this
         Preference preference = findPreference(getString(R.string.pref_radius_key));
         preference.setOnPreferenceChangeListener(this);
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        //get the preference that was changed
         Preference preference = findPreference(key);
+
+        // Updates the summary for the preference if is not null
         if (null != preference) {
-            // Updates the summary for the preference
+            // You don't need to set up preference summaries for checkbox preferences because
+            // they are already set up in xml using summaryOff and summary On
             if (!(preference instanceof CheckBoxPreference)) {
                 String value = sharedPreferences.getString(preference.getKey(), "");
                 setPreferenceSummary(preference, value);
@@ -105,16 +116,17 @@ public class SettingsFragment extends PreferenceFragmentCompat
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         // In this context, we're using the onPreferenceChange listener for checking whether the
-        // size setting was set to a valid value.
+        // radius setting was set to a valid value.
 
+        //the error message that will be shown if an invalid value is entered
         Toast error = Toast.makeText(getContext(), "Please select a number greater than 0", Toast.LENGTH_SHORT);
 
-        // Double check that the preference is the size preference
+        // Double check that the preference is the radius preference
         String sizeKey = getString(R.string.pref_radius_key);
         if (preference.getKey().equals(sizeKey)) {
-            String stringSize = (String) newValue;
+            String radius = (String) newValue;
             try {
-                double size = Double.parseDouble(stringSize);
+                double size = Double.parseDouble(radius);
                 // If the number is outside of the acceptable range, show an error.
                 if (size <= 0) {
                     error.show();
@@ -126,12 +138,16 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 return false;
             }
         }
+
+        //numbers seems to be valid; accept it
         return true;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        //properly unregister the callback
         getPreferenceScreen().getSharedPreferences()
                 .unregisterOnSharedPreferenceChangeListener(this);
     }
