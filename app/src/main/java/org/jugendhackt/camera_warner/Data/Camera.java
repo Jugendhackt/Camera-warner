@@ -1,10 +1,13 @@
 package org.jugendhackt.camera_warner.Data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by Julian Mundhahs on 10.06.2017.
  */
 
-public class Camera {
+public class Camera implements Parcelable{
 
     private double latitude;
     private double longitude;
@@ -28,6 +31,18 @@ public class Camera {
 
         hasDirection = false;
     }
+
+    public static final Parcelable.Creator<Camera> CREATOR
+            = new Parcelable.Creator<Camera>() {
+        public Camera createFromParcel(Parcel in) {
+            return new Camera(in);
+        }
+
+        public Camera[] newArray(int size) {
+            return new Camera[size];
+        }
+    };
+
 
     public double getLatitude()
     {
@@ -57,5 +72,22 @@ public class Camera {
     public int getDirection_raw()
     {
         return direction;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public Camera(Parcel in)
+    {
+        latitude = in.readDouble();
+        longitude = in.readDouble();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeDouble(latitude);
+        dest.writeDouble(longitude);
     }
 }

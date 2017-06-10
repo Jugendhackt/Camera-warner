@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -20,7 +21,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import org.jugendhackt.camera_warner.Data.Camera;
 import org.jugendhackt.camera_warner.Data.DataProvider;
 import org.jugendhackt.camera_warner.Data.DatabaseDataProvider;
+import org.jugendhackt.camera_warner.Data.JuvenalDataProvider;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -28,33 +31,17 @@ import java.util.List;
  * Created by Julian Mundhahs on 10.06.2017.
  */
 
-public class LocationService extends Service{
-    private final IBinder binder = new Binder();
+public class LocationService extends Service {
+    public static final String TAG = "LocationService";
 
-    static int INTERVAL = 1000 * 30;
-    static int FASTEST_INTERVAL = 1000 * 15;
+    static int INTERVAL = 1000;
+    static int FASTEST_INTERVAL = 500;
     private FusedLocationProviderClient mClient;
     private LocationCallback callback;
     private Location lastLocation;
 
     private DataProvider provider;
-    public boolean camerasAvailable;
     private List<Camera> allCamerasCache;
-
-    final Messenger mMessenger = new Messenger(new IncomingHandler());
-
-    class IncomingHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 13:
-                    Log.d("LocationService", "message arrived");
-                    break;
-                default:
-                    super.handleMessage(msg);
-            }
-        }
-    }
 
     @Override
     public void onCreate() {
@@ -65,9 +52,13 @@ public class LocationService extends Service{
         callback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
+                Log.d("LocationService", "getLocation");
                 lastLocation = locationResult.getLastLocation();
+
+                sendLastLocationToActivity();
             }
         };
+
         LocationRequest request = new LocationRequest()
                 .setInterval(INTERVAL)
                 .setFastestInterval(FASTEST_INTERVAL)
@@ -79,41 +70,64 @@ public class LocationService extends Service{
                 .addOnSuccessListener(new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
-                        if(location != null)
-                        {
+                        if (location != null) {
                             lastLocation = location;
                         }
                     }
                 });
 
-        provider = new DatabaseDataProvider();
-        new Runnable() {
-            @Override
-            public void run() {
-                allCamerasCache = provider.getAllCameras();
-            }
-        }.run();
-    }
-
-    @Override
-    public IBinder onBind(Intent p1) {
-        return mMessenger.getBinder();
-    }
-
-    public List<Camera> getAllCameras()
-    {
-        return allCamerasCache;
-    }
-
-    public Location getLastLocation()
-    {
-        return lastLocation;
+        provider = new JuvenalDataProvider();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        mClient.getLastLocation()
+                .addOnSuccessListener(new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        if (location != null) {
+                            lastLocation = location;
+                            sendLastLocationToActivity();
+                        }
+                    }
+                });
+
+        LocationRequest request = new LocationRequest()
+                .setInterval(INTERVAL)
+                .setFastestInterval(FASTEST_INTERVAL)
+                .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        mClient.requestLocationUpdates(request, callback, null);
+        new Thread() {
+            @Override
+            public void run() {
+                Log.e(TAG, "gettingData");
+                allCamerasCache = provider.getAllCameras();
+                Log.e(TAG, "gotData");
+
+                sendAllCamerasCacheToActivity();
+            }
+        }.start();
+        Log.d(TAG, "starting Service");
         // If we get killed, after returning from here, restart
         return START_STICKY;
+    }
+
+    private void sendAllCamerasCacheToActivity() {
+        Intent intent = new Intent();
+        intent.setAction(getResources().getString(R.string.broadcast_camera));
+        ArrayList<Camera> cameras = new ArrayList<>(allCamerasCache);
+        intent.putParcelableArrayListExtra("list", cameras);
+        intent.setPackage("org.jugendhackt.camera_warner");
+        sendBroadcast(intent);
+    }
+
+    private void sendLastLocationToActivity() {
+        Intent intent = new Intent();
+        intent.setAction(getResources().getString(R.string.broadcast_location));
+        intent.putExtra("latitude", lastLocation.getLatitude());
+        intent.putExtra("longitude", lastLocation.getLongitude());
+        intent.setPackage("org.jugendhackt.camera_warner");
+        sendBroadcast(intent);
     }
 
     @Override
@@ -121,5 +135,11 @@ public class LocationService extends Service{
         mClient.removeLocationUpdates(callback);
 
         super.onDestroy();
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 }
