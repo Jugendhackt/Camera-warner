@@ -2,6 +2,7 @@ package org.jugendhackt.camera_warner;
 
 import android.content.Intent;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
@@ -103,6 +104,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             case R.id.action_settings:
                 Intent mapsActivity = new Intent(this, SettingsActivity.class);
                 startActivity(mapsActivity);
+                return true;
+            case R.id.action_add:
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"));
+                startActivity(browserIntent);
         }
 
         return super.onOptionsItemSelected(item);
