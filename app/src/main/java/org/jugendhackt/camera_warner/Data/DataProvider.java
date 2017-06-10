@@ -1,4 +1,4 @@
-package org.jugendhackt.camera_warner.Utils;
+package org.jugendhackt.camera_warner.Data;
 
 import org.jugendhackt.camera_warner.Data.Camera;
 

@@ -1,6 +1,4 @@
-package org.jugendhackt.camera_warner.Utils;
-
-import org.jugendhackt.camera_warner.Data.Camera;
+package org.jugendhackt.camera_warner.Data;
 
 import java.util.Arrays;
 import java.util.LinkedList;

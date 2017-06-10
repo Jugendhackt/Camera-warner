@@ -1,13 +1,11 @@
-package org.jugendhackt.camera_warner.Utils;
+package org.jugendhackt.camera_warner.Data;
 
 import android.location.Location;
-
-import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.jugendhackt.camera_warner.Data.Camera;
+import org.jugendhackt.camera_warner.Utils.NetworkUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,32 +17,38 @@ import java.util.List;
 
 public class DatabaseDataProvider implements DataProvider {
 
-    @Override
-    public List<Camera> getAllCameras() {
+    private static List<Camera> camerasCache;
+
+    private List<Camera> forceFetch() {
         try {
             return parseFromJSONArray(new JSONArray(NetworkUtils.getResponseFromHttpUrl(NetworkUtils.buildUrl())));
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
     }
 
     @Override
+    public List<Camera> getAllCameras() {
+        if (camerasCache == null) {
+            camerasCache = forceFetch();
+        }
+        return camerasCache;
+    }
+
+    @Override
     public Camera getNearestCamera(double latitude, double longitude) {
-        List<Camera> allCameras = getAllCameras();
         float[] result = {};
 
         float distance = Float.MAX_VALUE;
-        Camera nearest = allCameras.get(0);
+        Camera nearest = camerasCache.get(0);
 
-        for(Camera camera : allCameras)
-        {
+        for (Camera camera : camerasCache) {
             Location.distanceBetween(latitude, longitude, camera.getLatitude(), camera.getLongitude(), result);
 
-            if(result[0] < distance)
-            {
+            if (result[0] < distance) {
                 distance = result[0];
                 nearest = camera;
             }
@@ -59,11 +63,9 @@ public class DatabaseDataProvider implements DataProvider {
         return null;
     }
 
-    public List<Camera> parseFromJSONArray(JSONArray array)
-    {
+    public List<Camera> parseFromJSONArray(JSONArray array) {
         List<Camera> cameras = new ArrayList<>(array.length());
-        for(int i = 0; i < array.length(); i++)
-        {
+        for (int i = 0; i < array.length(); i++) {
             try {
                 JSONObject dieseCamera = array.getJSONObject(i);
                 Camera camera = new Camera(dieseCamera.getDouble("latitude"), dieseCamera.getDouble("longitude"));
