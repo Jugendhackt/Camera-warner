@@ -10,9 +10,10 @@ import android.view.MenuItem;
  * Created by Julian Mundhahs on 10.06.2017.
  */
 
+/**
+ * This Activity Class is just a wrapper for the {@link SettingsFragment}
+ */
 public class SettingsActivity extends AppCompatActivity {
-
-    //TODO: add (proper) documentation
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
