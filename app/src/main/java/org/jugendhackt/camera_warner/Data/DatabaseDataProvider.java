@@ -22,7 +22,7 @@ public class DatabaseDataProvider implements DataProvider {
 
     private List<Camera> forceFetch() {
         try {
-            return parseFromJSONArray(new JSONArray(NetworkUtils.getResponseFromHttpUrl(NetworkUtils.buildUrl())));
+            return parseFromJSONArray(new JSONArray(NetworkUtils.getResponseFromHttpUrl(NetworkUtils.LOCAL_DATABASE_URL)));
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (IOException e) {

@@ -20,7 +20,7 @@ public class JuvenalDataProvider implements DataProvider {
     private List<Camera> forceFetch() {
         JSONArray result = new JSONArray();
         try {
-            result = new JSONObject(NetworkUtils.juvenalRequest()).getJSONArray("features");
+            result = new JSONObject(NetworkUtils.getResponseFromJuvenal()).getJSONArray("features");
         } catch (JSONException e) {
             e.printStackTrace();
         }
