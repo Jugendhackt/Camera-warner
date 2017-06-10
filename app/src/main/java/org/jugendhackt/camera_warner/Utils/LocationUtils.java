@@ -12,6 +12,8 @@ import java.util.List;
 
 public class LocationUtils {
 
+    //TODO: add (proper) documentation
+
     public static Camera getNearestTo(double latitude, double longitude, List<Camera> cameras)
     {
         float[] result = new float[3];

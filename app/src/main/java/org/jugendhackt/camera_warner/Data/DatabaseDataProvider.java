@@ -18,6 +18,8 @@ import java.util.List;
 
 public class DatabaseDataProvider implements DataProvider {
 
+    //TODO: add (proper) documentation
+
     private static List<Camera> camerasCache;
 
     private List<Camera> forceFetch() {

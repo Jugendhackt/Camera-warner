@@ -34,6 +34,9 @@ import java.util.List;
  */
 
 public class LocationService extends Service {
+
+    //TODO: add (proper) documentation
+
     public static final String TAG = "LocationService";
 
     static int INTERVAL = 1000;

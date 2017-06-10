@@ -33,6 +33,8 @@ import java.util.List;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    //TODO: add (proper) documentation
+
     private GoogleMap mMap;
     static String TAG = "MapsActivity";
 

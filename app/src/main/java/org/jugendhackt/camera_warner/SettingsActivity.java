@@ -12,6 +12,8 @@ import android.view.MenuItem;
 
 public class SettingsActivity extends AppCompatActivity {
 
+    //TODO: add (proper) documentation
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

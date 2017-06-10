@@ -10,6 +10,8 @@ import java.util.List;
 
 public class FakeCameraProvider implements DataProvider{
 
+    //TODO: add (proper) documentation
+
     private Camera[] cameras = {new Camera(-31, 142), new Camera(53.563, 9.971), new Camera(0, 0)};
 
     @Override
