@@ -23,7 +23,6 @@ import org.jugendhackt.camera_warner.Data.Camera;
 import org.jugendhackt.camera_warner.Data.DataProvider;
 import org.jugendhackt.camera_warner.Data.DatabaseDataProvider;
 import org.jugendhackt.camera_warner.Data.JuvenalDataProvider;
-import org.jugendhackt.camera_warner.Utils.LocationUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +53,7 @@ public class LocationService extends Service {
         callback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                Log.d("LocationService", "getLocation");
+                Log.e("LocationService", "getLocation");
                 lastLocation = locationResult.getLastLocation();
 
                 sendLastLocationToActivity();
@@ -79,6 +78,7 @@ public class LocationService extends Service {
                     public void onSuccess(Location location) {
                         if (location != null) {
                             lastLocation = location;
+                            Log.e(TAG, "sending last location");
                             sendLastLocationToActivity();
                         }
                     }
