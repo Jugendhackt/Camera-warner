@@ -31,7 +31,7 @@ import org.jugendhackt.camera_warner.Data.Camera;
 
 import java.util.List;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback{
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     static String TAG = "MapsActivity";
@@ -41,6 +41,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private BroadcastReceiver receiver;
     private BroadcastReceiver receiver1;
+
+    private boolean followed;
 
     @Override
     protected void onDestroy() {
@@ -115,8 +117,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.addMarker(new MarkerOptions().position(location).title("Eine Kamera").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
     }
 
-    private void addCamera(Camera camera)
-    {
+    private void addCamera(Camera camera) {
         addCamera(new LatLng(camera.getLatitude(), camera.getLongitude()));
     }
 
@@ -128,15 +129,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d(TAG, String.valueOf(location.getLatitude()));
         Log.d(TAG, String.valueOf(location.getLongitude()));
         LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
+        if (!followed) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
+            followed = true;
+        }
 
         locationMarker = mMap.addMarker(new MarkerOptions().position(userLocation).title("Your location"));
 
-        if(radiusCircle!=null)
-        {
+        if (radiusCircle != null) {
             radiusCircle.remove();
         }
-        radiusCircle = mMap.addCircle(new CircleOptions().center(locationMarker.getPosition()).radius(Double.parseDouble(PreferenceManager.getDefaultSharedPreferences(this).getString("pref_radius", "100"))).fillColor(Color.argb(195,102,147,173)));
+        radiusCircle = mMap.addCircle(new CircleOptions().center(locationMarker.getPosition()).radius(Double.parseDouble(PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.pref_radius_key), "100"))).fillColor(Color.argb(195, 102, 147, 173)));
     }
 
     /**
