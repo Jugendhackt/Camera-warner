@@ -5,6 +5,7 @@ import android.location.Location;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jugendhackt.camera_warner.Utils.LocationUtils;
 import org.jugendhackt.camera_warner.Utils.NetworkUtils;
 
 import java.io.IOException;
@@ -40,22 +41,14 @@ public class DatabaseDataProvider implements DataProvider {
 
     @Override
     public Camera getNearestCamera(double latitude, double longitude) {
-        float[] result = {};
+        return LocationUtils.getNearestTo(latitude, longitude, camerasCache);
 
-        float distance = Float.MAX_VALUE;
-        Camera nearest = camerasCache.get(0);
+    }
 
-        for (Camera camera : camerasCache) {
-            Location.distanceBetween(latitude, longitude, camera.getLatitude(), camera.getLongitude(), result);
-
-            if (result[0] < distance) {
-                distance = result[0];
-                nearest = camera;
-            }
-        }
-
-        return nearest;
-
+    @Override
+    public float distanceToNearestCamera(double latitude, double longitude) {
+        Camera nearestCamera = getNearestCamera(latitude, longitude);
+        return LocationUtils.distanceBetween(latitude, longitude, nearestCamera.getLatitude(), nearestCamera.getLongitude());
     }
 
     @Override
