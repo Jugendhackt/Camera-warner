@@ -22,6 +22,7 @@
 
     <string name="pref_radius_key">pref_radius</string>
     <string name="pref_radius_label">Radius</string>
+    <string name="pref_radius_default">200</string>
 
     <string name="pref_active_key">pref_active</string>
     <string name="pref_active_label">Send Notifications</string>
@@ -33,4 +34,5 @@
 
     <string name="action_settings" >@string/title_activity_settings</string>
     <string name="action_add_camera" >Add a new Camera</string>
+
 </resources>

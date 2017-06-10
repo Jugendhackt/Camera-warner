@@ -7,7 +7,7 @@
         android:key="@string/pref_radius_key"
         android:title="@string/pref_radius_label"
         tools:summary="Set the size of the radius"
-        android:defaultValue="@integer/pref_radius_default" />
+        android:defaultValue="@string/pref_radius_default" />
 
     <CheckBoxPreference
         android:defaultValue="@bool/pref_active_default"
