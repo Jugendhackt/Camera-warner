@@ -10,7 +10,9 @@
         android:key="pref_warning"
         android:title="Suche"
         android:summary="Wenn Aktiv: sucht nach kameras"
-        android:defaultValue="false" />
-
+        android:defaultValue="true" />
+    <Preference
+        android:title="Anmelden"
+        android:key ="pref_anmelden"/>
 
 </PreferenceScreen>
