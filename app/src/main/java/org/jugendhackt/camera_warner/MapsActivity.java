@@ -163,10 +163,5 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         for (Camera camera : data) {
             addCamera(camera);
         }
-
-    }
-
-    private void showErrorMessage() {
-        Toast.makeText(this, "Failed to fetch data", Toast.LENGTH_LONG).show();
     }
 }
