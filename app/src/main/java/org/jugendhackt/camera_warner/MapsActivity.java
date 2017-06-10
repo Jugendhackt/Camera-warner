@@ -1,15 +1,16 @@
 package org.jugendhackt.camera_warner;
 
-<<<<<<< HEAD
+
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
-=======
-import android.content.*;
->>>>>>> 61b3a16abdfc50a4412fa5473d136976938d2ba8
+
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
