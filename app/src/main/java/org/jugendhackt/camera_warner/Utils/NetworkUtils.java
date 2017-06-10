@@ -24,43 +24,22 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
-import okhttp3.RequestBody;
 
 /**
  * These utilities will be used to communicate with the network.
+ * They also contain the URL the data is stored at.
  */
 public class NetworkUtils {
 
-    //TODO: Datenbankzugriff in Klassen verpacken, siehe DataProvider
+    public final static String LOCAL_DATABASE_URL = "http://172.16.107.61/cameras.php";
+    public final static String JUVENAL = "http://www.juvenal.org/api/cameras";
 
-    final static String GITHUB_BASE_URL =
-            "http://172.16.107.61/cameras.php";
-    final static String JUVENAL = "http://www.juvenal.org/api/cameras";
-
-
-    //TODO: Kommentare anpassen
     /**
-     * Builds the URL used to query GitHub.
-     *
-     * @return The URL to use to query the GitHub.
+     * Gets the data from the api of Juvenal.org This access is packaged into a seperate Method because a speciel Header field has to be set.
+     * @return The data retrieved from the api as a String in JSON format.
      */
-    public static URL buildUrl() {
-        Uri builtUri = Uri.parse(GITHUB_BASE_URL).buildUpon()
-                .build();
-
-        URL url = null;
-        try {
-            url = new URL(builtUri.toString());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-        return url;
-    }
-
-    public static String juvenalRequest()
+    public static String getResponseFromJuvenal()
     {
         OkHttpClient client = new OkHttpClient();
         okhttp3.Request request = new okhttp3.Request.Builder()
@@ -80,11 +59,12 @@ public class NetworkUtils {
     /**
      * This method returns the entire result from the HTTP response.
      *
-     * @param url The URL to fetch the HTTP response from.
+     * @param urlStr The URL to fetch the HTTP response from.
      * @return The contents of the HTTP response.
      * @throws IOException Related to network and stream reading
      */
-    public static String getResponseFromHttpUrl(URL url) throws IOException {
+    public static String getResponseFromHttpUrl(String urlStr) throws IOException {
+        URL url = new URL(urlStr);
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {
             InputStream in = urlConnection.getInputStream();
