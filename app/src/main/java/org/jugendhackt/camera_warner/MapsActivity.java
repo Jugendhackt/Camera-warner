@@ -1,15 +1,17 @@
 package org.jugendhackt.camera_warner;
 
 import android.content.Intent;
-import android.icu.util.TimeUnit;
 import android.location.Location;
-import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -25,11 +27,18 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.jugendhackt.camera_warner.Data.Camera;
 import org.jugendhackt.camera_warner.Utils.DataProvider;
 import org.jugendhackt.camera_warner.Utils.FakeCameraProvider;
+import org.jugendhackt.camera_warner.Utils.NetworkUtils;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+import java.io.IOException;
+
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
+        LoaderManager.LoaderCallbacks<String>{
 
     private GoogleMap mMap;
     private FusedLocationProviderClient mClient;
@@ -41,6 +50,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     static int FASTEST_INTERVAL = 1000 * 15;
 
     private DataProvider provider;
+
+    private static final int SQL_SEARCH_LOADER = 22;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +79,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mClient.requestLocationUpdates(request, callback, null);
 
         provider = new FakeCameraProvider();
+
+        /*
+         * Initialize the loader
+         */
+        getSupportLoaderManager().initLoader(SQL_SEARCH_LOADER, null, this);
     }
 
     @Override
@@ -94,8 +110,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void setUpCameras() {
         for (Camera camera : provider.getAllCameras()) {
             LatLng cameraPosition = new LatLng(camera.getLatitude(), camera.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(cameraPosition).title("Eine Kamera"));
+            addCamera(cameraPosition);
         }
+    }
+
+    private void addCamera(LatLng location)
+    {
+        mMap.addMarker(new MarkerOptions().position(location).title("Eine Kamera"));
     }
 
     private void updateLocationOnMap(@NonNull Location location) {
@@ -135,5 +156,74 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 });
 
         setUpCameras();
+    }
+
+    @Override
+    public Loader<String> onCreateLoader(int id, Bundle args) {
+        return new AsyncTaskLoader<String>(this) {
+            String queryResult;
+
+            @Override
+            public void deliverResult(String data) {
+                queryResult = data;
+                Log.d(TAG, data);
+                super.deliverResult(data);
+            }
+
+            @Override
+            protected void onStartLoading() {
+                if(queryResult != null)
+                {
+                    deliverResult(queryResult);
+                }
+                else
+                {
+                    forceLoad();
+                }
+            }
+
+            @Override
+            public String loadInBackground() {
+                try {
+                    return NetworkUtils.getResponseFromHttpUrl(NetworkUtils.buildUrl());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<String> loader, String data) {
+        if (null == data) {
+            showErrorMessage();
+        } else {
+            addData(data);
+        }
+
+    }
+
+    private void addData(String data) {
+        try {
+            JSONArray array = new JSONArray(data);
+            for(int i = 0; i<array.length(); i++)
+            {
+               JSONObject camera = array.getJSONObject(i);
+                LatLng position = new LatLng(Float.parseFloat(camera.getString("coordinate1")), Float.parseFloat(camera.getString("coordinate2")));
+                addCamera(position);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showErrorMessage() {
+        Toast.makeText(this, "Failed to fetch data", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<String> loader) {
+
     }
 }
