@@ -1,11 +1,15 @@
 package org.jugendhackt.camera_warner;
 
+import android.content.Intent;
 import android.icu.util.TimeUnit;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -25,7 +29,7 @@ import org.jugendhackt.camera_warner.Data.Camera;
 import org.jugendhackt.camera_warner.Utils.DataProvider;
 import org.jugendhackt.camera_warner.Utils.FakeCameraProvider;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private FusedLocationProviderClient mClient;
@@ -64,6 +68,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mClient.requestLocationUpdates(request, callback, null);
 
         provider = new FakeCameraProvider();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.map_menu, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemID = item.getItemId();
+
+        switch (itemID)
+        {
+            case R.id.action_settings:
+                Intent mapsActivity = new Intent(this, EinstellungenActivity.class);
+                startActivity(mapsActivity);
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void setUpCameras() {
