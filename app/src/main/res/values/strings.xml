@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">"Camera-warner "</string>
     <string name="title_activity_maps">Map</string>
+    <string name="title_activity_einstellungen">Einstellungen</string>
 </resources>
