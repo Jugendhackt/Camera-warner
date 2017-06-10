@@ -21,6 +21,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import org.jugendhackt.camera_warner.Data.Camera;
+import org.jugendhackt.camera_warner.Utils.DataProvider;
+import org.jugendhackt.camera_warner.Utils.FakeCameraProvider;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
@@ -29,8 +33,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationCallback callback;
 
     private Marker lastMarker;
-    static int INTERVAL = 1000 * 15;
-    static int FASTEST_INTERVAL = 1000 * 5;
+    static int INTERVAL = 1000 * 30;
+    static int FASTEST_INTERVAL = 1000 * 15;
+
+    private DataProvider provider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,11 +62,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
         mClient.requestLocationUpdates(request, callback, null);
+
+        provider = new FakeCameraProvider();
     }
 
-    private void updateLocationOnMap(@NonNull Location location)
-    {
-        lastMarker.remove();
+    private void setUpCameras() {
+        for (Camera camera : provider.getAllCameras()) {
+            LatLng cameraPosition = new LatLng(camera.getLatitude(), camera.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(cameraPosition).title("Eine Kamera"));
+        }
+    }
+
+    private void updateLocationOnMap(@NonNull Location location) {
+        if (lastMarker != null) {
+            lastMarker.remove();
+        }
         Log.d(TAG, String.valueOf(location.getAccuracy()));
         Log.d(TAG, String.valueOf(location.getLatitude()));
         Log.d(TAG, String.valueOf(location.getLongitude()));
@@ -87,11 +103,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
-                        if(location != null)
-                        {
+                        if (location != null) {
                             updateLocationOnMap(location);
                         }
                     }
                 });
+
+        setUpCameras();
     }
 }
