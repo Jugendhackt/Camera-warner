@@ -33,19 +33,28 @@ import java.util.List;
  * Created by Julian Mundhahs on 10.06.2017.
  */
 
+/**
+ * This Service is supposed to be running in the background permanently to be able to notify the user of any cctv in their surrounding.
+ * All data that is received is broadcasted. If additional data (e.g. list of cameras is needed) the ui can start service. The data will then again be broadcasted from {@link #onStartCommand}
+ */
 public class LocationService extends Service {
 
-    //TODO: add (proper) documentation
-
+    //logging
     public static final String TAG = "LocationService";
 
+    //the interval in which the service wishes to be notified of the users location (expected, min)
     static int INTERVAL = 1000;
     static int FASTEST_INTERVAL = 500;
     private FusedLocationProviderClient mClient;
+    //called for the location updates; needed to properly unregister the callback
     private LocationCallback callback;
+    //the last received location
+    //TODO: check if actually needed
     private Location lastLocation;
 
+    //the data provide from which we will get our data
     private DataProvider provider;
+    //TODO: remove because the dataproviders are already implementing caching
     private List<Camera> allCamerasCache = new LinkedList<>();
 
     @Override
@@ -54,6 +63,8 @@ public class LocationService extends Service {
 
         mClient = LocationServices.getFusedLocationProviderClient(this);
 
+        //implementation of the location update callback
+        //what happens when the service receives the user location is defined here
         callback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -71,11 +82,18 @@ public class LocationService extends Service {
             }
         };
 
+        //the DataProvider; any can be inserted here
+        //TODO: make the selectable in the settings
+        //or
+        //TODO: add multiple ones
         provider = new JuvenalDataProvider();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "onStartCommand");
+
+        //try to initialize lastLocation with the systems last known location until we have a gps position
         mClient.getLastLocation()
                 .addOnSuccessListener(new OnSuccessListener<Location>() {
                     @Override
@@ -88,11 +106,15 @@ public class LocationService extends Service {
                     }
                 });
 
+        //defines what and who often location updates should be received
         LocationRequest request = new LocationRequest()
                 .setInterval(INTERVAL)
                 .setFastestInterval(FASTEST_INTERVAL)
                 .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        //actually request the location updates
         mClient.requestLocationUpdates(request, callback, null);
+
+        //TODO: we're not on the main thread; deactivate network on main thread
         new Thread() {
             @Override
             public void run() {
@@ -103,11 +125,16 @@ public class LocationService extends Service {
                 sendAllCamerasCacheToActivity();
             }
         }.start();
-        Log.d(TAG, "starting Service");
+
+        Log.d(TAG, "started Service");
+
         // If we get killed, after returning from here, restart
         return START_STICKY;
     }
 
+    /**
+     * Broacast all cameras. Only internally in this packet
+     */
     private void sendAllCamerasCacheToActivity() {
         Intent intent = new Intent();
         intent.setAction(getResources().getString(R.string.broadcast_camera));
@@ -117,6 +144,9 @@ public class LocationService extends Service {
         sendBroadcast(intent);
     }
 
+    /**
+     * Broacast the location in lastLocation. Only internally in this packet
+     */
     private void sendLastLocationToActivity() {
         Intent intent = new Intent();
         intent.setAction(getResources().getString(R.string.broadcast_location));
@@ -128,11 +158,17 @@ public class LocationService extends Service {
 
     @Override
     public void onDestroy() {
+        //properly remove the callback
         mClient.removeLocationUpdates(callback);
 
         super.onDestroy();
     }
 
+    /**
+     * not used
+     * @param intent
+     * @return
+     */
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {

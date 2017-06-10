@@ -13,12 +13,19 @@ import java.util.List;
  * Created by Julian Mundhahs on 10.06.2017.
  */
 
+/**
+ * This DataProvider provides the data that is also available on juvenal.org.
+ * It is blocking.
+ */
 public class JuvenalDataProvider implements DataProvider {
 
-    //TODO: add (proper) documentation
-
+    //to avoid having to fetch the data every time
     private static List<Camera> camerasCache;
 
+    /**
+     * Actually loads data from the data source
+     * @return the data that has been loaded
+     */
     private List<Camera> forceFetch() {
         JSONArray result = new JSONArray();
         try {

@@ -16,12 +16,19 @@ import java.util.List;
  * Created by Julian Mundhahs on 10.06.2017.
  */
 
+/**
+ * This class provides data from local MySQL Database that is accessible via a php script.
+ * It therefore is blocking.
+ */
 public class DatabaseDataProvider implements DataProvider {
 
-    //TODO: add (proper) documentation
-
+    //to avoid having to fetch the data every time
     private static List<Camera> camerasCache;
 
+    /**
+     * Actually loads data from the data source
+     * @return the data that has been loaded
+     */
     private List<Camera> forceFetch() {
         try {
             return parseFromJSONArray(new JSONArray(NetworkUtils.getResponseFromHttpUrl(NetworkUtils.LOCAL_DATABASE_URL)));
@@ -58,6 +65,11 @@ public class DatabaseDataProvider implements DataProvider {
         return null;
     }
 
+    /**
+     * Parses the format specific to this database's output and return it as List of Cameras
+     * @param array the json array that contains the different camera object
+     * @return the list of cameras
+     */
     public List<Camera> parseFromJSONArray(JSONArray array) {
         List<Camera> cameras = new ArrayList<>(array.length());
         for (int i = 0; i < array.length(); i++) {

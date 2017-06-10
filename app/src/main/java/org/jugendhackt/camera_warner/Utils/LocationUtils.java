@@ -10,10 +10,20 @@ import java.util.List;
  * Created by Julian Mundhahs on 10.06.2017.
  */
 
+/**
+ * This class provides some wrapers for functions concerning the comparison of two locations
+ */
 public class LocationUtils {
 
-    //TODO: add (proper) documentation
+    //TODO: provide additional more needed and usefull wrappers (for Location and Camera)
 
+    /**
+     * This method provides the Camera out of the list that is nearest to the given location
+     * @param latitude latitude of the location
+     * @param longitude longitude of the location
+     * @param cameras a list of cameras out of which the nearest will be returned
+     * @return the camera nearest to the location
+     */
     public static Camera getNearestTo(double latitude, double longitude, List<Camera> cameras)
     {
         float[] result = new float[3];
@@ -33,6 +43,14 @@ public class LocationUtils {
         return nearest;
     }
 
+    /**
+     * Returns the distance between two locations in m
+     * @param latitude1 latitude of the 1st location
+     * @param longitude1 longitude of the 1st location
+     * @param latitude2 latitude of the 2nd location
+     * @param longitude2 longitude of the 2nd location
+     * @return the distance between the locations in m
+     */
     public static float distanceBetween(double latitude1, double longitude1, double latitude2, double longitude2)
     {
         float[] result = new float[3];

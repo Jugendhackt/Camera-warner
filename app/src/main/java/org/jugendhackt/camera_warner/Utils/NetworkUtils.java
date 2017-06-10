@@ -32,6 +32,8 @@ import okhttp3.OkHttpClient;
  */
 public class NetworkUtils {
 
+    //the urls to get the data from the two online apis
+    //TODO: move to coresponding classes
     public final static String LOCAL_DATABASE_URL = "http://172.16.107.61/cameras.php";
     public final static String JUVENAL = "http://www.juvenal.org/api/cameras";
 

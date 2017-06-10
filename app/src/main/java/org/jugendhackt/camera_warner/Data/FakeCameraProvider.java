@@ -8,10 +8,13 @@ import java.util.List;
  * Created by Julian Mundhahs on 10.06.2017.
  */
 
+/**
+ * This is just a DataProvider that provides *fake* and constant data. It should be used for test purposes only!
+ * It therefore is not blocking.
+ */
 public class FakeCameraProvider implements DataProvider{
 
-    //TODO: add (proper) documentation
-
+    //a small array with some fake data
     private Camera[] cameras = {new Camera(-31, 142), new Camera(53.563, 9.971), new Camera(0, 0)};
 
     @Override
