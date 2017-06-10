@@ -84,7 +84,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         switch (itemID)
         {
             case R.id.action_settings:
-                Intent mapsActivity = new Intent(this, EinstellungenActivity.class);
+                Intent mapsActivity = new Intent(this, SettingsActivity.class);
                 startActivity(mapsActivity);
         }
 

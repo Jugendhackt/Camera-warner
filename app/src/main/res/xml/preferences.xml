@@ -6,7 +6,7 @@
         android:title="Radius"
         android:summary="3 Meter ungenauigkeit"
         android:defaultValue="3" />
-    <SwitchPreference
+    <CheckBoxPreference
         android:key="pref_warning"
         android:title="Suche"
         android:summary="Wenn Aktiv: sucht nach kameras"
