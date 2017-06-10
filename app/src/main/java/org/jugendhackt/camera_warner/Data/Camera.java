@@ -12,24 +12,11 @@ public class Camera implements Parcelable{
     private double latitude;
     private double longitude;
 
-    private boolean hasDirection;
-    private int direction;
-
-    public Camera(double latitude, double longitude, int direction)
-    {
-        this.latitude = latitude;
-        this.longitude = longitude;
-
-        this.direction = direction;
-        hasDirection = true;
-    }
 
     public Camera(double latitude, double longitude)
     {
         this.latitude = latitude;
         this.longitude = longitude;
-
-        hasDirection = false;
     }
 
     public static final Parcelable.Creator<Camera> CREATOR
@@ -52,26 +39,6 @@ public class Camera implements Parcelable{
     public double getLongitude()
     {
         return longitude;
-    }
-
-    public boolean hasDirection()
-    {
-        return hasDirection;
-    }
-
-    public int getDirection() throws IllegalStateException
-    {
-        if(!hasDirection)
-        {
-            throw new IllegalStateException("This field isnt set");
-        }
-
-        return direction;
-    }
-
-    public int getDirection_raw()
-    {
-        return direction;
     }
 
     @Override
