@@ -20,8 +20,8 @@ public class FakeCameraProvider implements DataProvider{
     }
 
     @Override
-    public List<Camera> getNearestCamera(double latitude, double longitude) {
-        return new LinkedList<>(Arrays.asList(cameras[1]));
+    public Camera getNearestCamera(double latitude, double longitude) {
+        return cameras[1];
     }
 
     @Override

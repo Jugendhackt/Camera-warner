@@ -10,10 +10,10 @@ import java.util.List;
 
 public interface DataProvider {
 
-    List<Camera> getAllCameras();
+    public List<Camera> getAllCameras();
 
-    List<Camera> getNearestCamera(double latitude, double longitude);
+    public Camera getNearestCamera(double latitude, double longitude);
 
-    List<Camera> getCamerasInRange(double latitude, double longitude, int radius);
+    public List<Camera> getCamerasInRange(double latitude, double longitude, int radius);
 
 }

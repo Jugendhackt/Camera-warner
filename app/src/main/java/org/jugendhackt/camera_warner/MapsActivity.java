@@ -32,13 +32,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.jugendhackt.camera_warner.Data.Camera;
 import org.jugendhackt.camera_warner.Utils.DataProvider;
+import org.jugendhackt.camera_warner.Utils.DatabaseDataProvider;
 import org.jugendhackt.camera_warner.Utils.FakeCameraProvider;
 import org.jugendhackt.camera_warner.Utils.NetworkUtils;
 
 import java.io.IOException;
+import java.util.List;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
-        LoaderManager.LoaderCallbacks<String>{
+        LoaderManager.LoaderCallbacks<List<Camera>> {
 
     private GoogleMap mMap;
     private FusedLocationProviderClient mClient;
@@ -97,8 +99,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemID = item.getItemId();
 
-        switch (itemID)
-        {
+        switch (itemID) {
             case R.id.action_settings:
                 Intent mapsActivity = new Intent(this, SettingsActivity.class);
                 startActivity(mapsActivity);
@@ -114,9 +115,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void addCamera(LatLng location)
-    {
+    private void addCamera(LatLng location) {
         mMap.addMarker(new MarkerOptions().position(location).title("Eine Kamera"));
+    }
+
+    private void addCamera(Camera camera)
+    {
+        addCamera(new LatLng(camera.getLatitude(), camera.getLongitude()));
     }
 
     private void updateLocationOnMap(@NonNull Location location) {
@@ -159,43 +164,35 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    public Loader<String> onCreateLoader(int id, Bundle args) {
-        return new AsyncTaskLoader<String>(this) {
-            String queryResult;
+    public Loader<List<Camera>> onCreateLoader(int id, Bundle args) {
+        return new AsyncTaskLoader<List<Camera>>(this) {
+            List<Camera> queryResult;
 
             @Override
-            public void deliverResult(String data) {
+            public void deliverResult(List<Camera> data) {
                 queryResult = data;
-                Log.d(TAG, data);
                 super.deliverResult(data);
             }
 
             @Override
             protected void onStartLoading() {
-                if(queryResult != null)
-                {
+                if (queryResult != null) {
                     deliverResult(queryResult);
-                }
-                else
-                {
+                } else {
                     forceLoad();
                 }
             }
 
             @Override
-            public String loadInBackground() {
-                try {
-                    return NetworkUtils.getResponseFromHttpUrl(NetworkUtils.buildUrl());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return null;
-                }
+            public List<Camera> loadInBackground() {
+                DataProvider provider = new DatabaseDataProvider();
+                return provider.getAllCameras();
             }
         };
     }
 
     @Override
-    public void onLoadFinished(Loader<String> loader, String data) {
+    public void onLoadFinished(Loader<List<Camera>> loader, List<Camera> data) {
         if (null == data) {
             showErrorMessage();
         } else {
@@ -204,18 +201,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    private void addData(String data) {
-        try {
-            JSONArray array = new JSONArray(data);
-            for(int i = 0; i<array.length(); i++)
-            {
-               JSONObject camera = array.getJSONObject(i);
-                LatLng position = new LatLng(Float.parseFloat(camera.getString("coordinate1")), Float.parseFloat(camera.getString("coordinate2")));
-                addCamera(position);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+    private void addData(List<Camera> data) {
+        for (Camera camera : data) {
+            addCamera(camera);
         }
+
     }
 
     private void showErrorMessage() {
@@ -223,7 +213,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    public void onLoaderReset(Loader<String> loader) {
+    public void onLoaderReset(Loader<List<Camera>> loader) {
 
     }
 }
