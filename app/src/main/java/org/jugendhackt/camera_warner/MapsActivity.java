@@ -1,18 +1,36 @@
 package org.jugendhackt.camera_warner;
 
+import android.icu.util.TimeUnit;
+import android.location.Location;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private FusedLocationProviderClient mClient;
+    static String TAG = "MapsActivity";
+    private LocationCallback callback;
+
+    private Marker lastMarker;
+    static int INTERVAL = 1000 * 15;
+    static int FASTEST_INTERVAL = 1000 * 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,8 +40,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        mClient = LocationServices.getFusedLocationProviderClient(this);
+
+        mClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        if(location != null)
+                        {
+                            updateLocationOnMap(location);
+                        }
+                    }
+                });
+
+        callback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                Location location = locationResult.getLastLocation();
+                updateLocationOnMap(location);
+            }
+        };
+        LocationRequest request = new LocationRequest()
+                .setInterval(INTERVAL)
+                .setFastestInterval(FASTEST_INTERVAL)
+                .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+
+        mClient.requestLocationUpdates(request, callback, null);
     }
 
+    private void updateLocationOnMap(@NonNull Location location)
+    {
+        lastMarker.remove();
+        Log.d(TAG, String.valueOf(location.getAccuracy()));
+        Log.d(TAG, String.valueOf(location.getLatitude()));
+        Log.d(TAG, String.valueOf(location.getLongitude()));
+        LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
+
+        lastMarker = mMap.addMarker(new MarkerOptions().position(userLocation).title("Your location"));
+    }
 
     /**
      * Manipulates the map once available.
@@ -40,7 +96,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        lastMarker = mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 10));
     }
 }
