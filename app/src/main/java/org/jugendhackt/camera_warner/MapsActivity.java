@@ -5,11 +5,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +21,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -32,15 +36,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     static String TAG = "MapsActivity";
 
-    private Marker lastMarker;
+    private Marker locationMarker;
+    private Circle radiusCircle;
 
     private BroadcastReceiver receiver;
     private BroadcastReceiver receiver1;
 
     @Override
-    protected void onStop() {
+    protected void onDestroy() {
         unregisterReceiver(receiver);
-        super.onStop();
+        unregisterReceiver(receiver1);
+        super.onDestroy();
     }
 
     @Override
@@ -106,7 +112,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void addCamera(LatLng location) {
-        mMap.addMarker(new MarkerOptions().position(location).title("Eine Kamera"));
+        mMap.addMarker(new MarkerOptions().position(location).title("Eine Kamera").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
     }
 
     private void addCamera(Camera camera)
@@ -115,8 +121,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void updateLocationOnMap(@NonNull Location location) {
-        if (lastMarker != null) {
-            lastMarker.remove();
+        if (locationMarker != null) {
+            locationMarker.remove();
         }
         Log.d(TAG, String.valueOf(location.getAccuracy()));
         Log.d(TAG, String.valueOf(location.getLatitude()));
@@ -124,7 +130,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
 
-        lastMarker = mMap.addMarker(new MarkerOptions().position(userLocation).title("Your location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+        locationMarker = mMap.addMarker(new MarkerOptions().position(userLocation).title("Your location"));
+
+        if(radiusCircle!=null)
+        {
+            radiusCircle.remove();
+        }
+        radiusCircle = mMap.addCircle(new CircleOptions().center(locationMarker.getPosition()).radius(Double.parseDouble(PreferenceManager.getDefaultSharedPreferences(this).getString("pref_radius", "100"))).fillColor(Color.argb(195,102,147,173)));
     }
 
     /**
