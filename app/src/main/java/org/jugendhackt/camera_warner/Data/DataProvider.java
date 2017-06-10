@@ -14,6 +14,8 @@ public interface DataProvider {
 
     public Camera getNearestCamera(double latitude, double longitude);
 
+    public float distanceToNearestCamera(double latitude, double longitude);
+
     public List<Camera> getCamerasInRange(double latitude, double longitude, int radius);
 
 }
