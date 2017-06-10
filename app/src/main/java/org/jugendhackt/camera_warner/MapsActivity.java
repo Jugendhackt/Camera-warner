@@ -43,17 +43,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mClient = LocationServices.getFusedLocationProviderClient(this);
 
-        mClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if(location != null)
-                        {
-                            updateLocationOnMap(location);
-                        }
-                    }
-                });
-
         callback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -94,9 +83,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        lastMarker = mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 10));
+        mClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        if(location != null)
+                        {
+                            updateLocationOnMap(location);
+                        }
+                    }
+                });
     }
 }
