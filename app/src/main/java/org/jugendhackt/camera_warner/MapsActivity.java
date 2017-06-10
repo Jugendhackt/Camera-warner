@@ -1,9 +1,17 @@
 package org.jugendhackt.camera_warner;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -28,16 +36,12 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.jugendhackt.camera_warner.Data.Camera;
-import org.jugendhackt.camera_warner.Utils.DataProvider;
-import org.jugendhackt.camera_warner.Utils.DatabaseDataProvider;
-import org.jugendhackt.camera_warner.Utils.FakeCameraProvider;
+import org.jugendhackt.camera_warner.Data.DataProvider;
+import org.jugendhackt.camera_warner.Data.DatabaseDataProvider;
+import org.jugendhackt.camera_warner.Data.JuvenalDataProvider;
 import org.jugendhackt.camera_warner.Utils.NetworkUtils;
 
-import java.io.IOException;
 import java.util.List;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
@@ -52,9 +56,51 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     static int INTERVAL = 1000 * 30;
     static int FASTEST_INTERVAL = 1000 * 15;
 
-    private DataProvider provider;
-
     private static final int SQL_SEARCH_LOADER = 22;
+
+    class IncomingHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 12:
+                    Log.d(TAG, "callback");
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
+        }
+    }
+
+    private Messenger myService;
+    private boolean bound = false;
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // cast the IBinder and get MyService instance
+            myService = new Messenger(service);
+            Log.d(TAG, "conncted");
+
+            try {
+                myService.send(Message.obtain(null, 13, this.hashCode(), 0));
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+
+            bound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            bound = false;
+        }
+    };
+
+    private void attachCallback() {
+        Intent intent = new Intent(MapsActivity.this, LocationCallback.class);
+
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,12 +127,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mClient.requestLocationUpdates(request, callback, null);
 
-        provider = new FakeCameraProvider();
-
         /*
          * Initialize the loader
          */
         getSupportLoaderManager().initLoader(SQL_SEARCH_LOADER, null, this);
+
+        attachCallback();
     }
 
     @Override
@@ -111,13 +157,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void setUpCameras() {
-        for (Camera camera : provider.getAllCameras()) {
-            LatLng cameraPosition = new LatLng(camera.getLatitude(), camera.getLongitude());
-            addCamera(cameraPosition);
-        }
     }
 
     private void addCamera(LatLng location) {
@@ -164,8 +203,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     }
                 });
-
-        setUpCameras();
     }
 
     @Override
@@ -190,7 +227,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             @Override
             public List<Camera> loadInBackground() {
-                DataProvider provider = new DatabaseDataProvider();
+                //DataProvider provider = new DatabaseDataProvider();
+                DataProvider provider = new JuvenalDataProvider();
+
                 return provider.getAllCameras();
             }
         };
