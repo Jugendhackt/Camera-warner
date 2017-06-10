@@ -16,8 +16,7 @@ public class EinstellungenActivity extends PreferenceActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Toast.makeText(this, "Einstellungen-Activity gestartet.", Toast.LENGTH_SHORT).show();
-        Toast.makeText(this, "Zurück mit Back-Button.", Toast.LENGTH_SHORT).show();
+        addPreferencesFromResource(R.xml.preferences);
     }
 
     @Override
