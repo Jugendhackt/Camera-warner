@@ -74,7 +74,7 @@ public class LocationService extends Service {
                 sendLastLocationToActivity();
 
                 if (allCamerasCache != null) {
-                    if(provider.distanceToNearestCamera(lastLocation.getLatitude(), lastLocation.getLongitude()) < Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default))))
+                    if(provider.distanceToNearestCamera(lastLocation) < Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default))))
                     {
                         Log.e(TAG, "a camera is to near");
                     }
