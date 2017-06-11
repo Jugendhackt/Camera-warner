@@ -51,13 +51,12 @@ public class LocationService extends Service {
     public static final String TAG = "LocationService";
 
     //the interval in which the service wishes to be notified of the users location (expected, min)
-    static int INTERVAL = 1000;
-    static int FASTEST_INTERVAL = 500;
+    static int INTERVAL = 1000 * 15;
+    static int FASTEST_INTERVAL = 1000 * 5;
     private FusedLocationProviderClient mClient;
     //called for the location updates; needed to properly unregister the callback
     private LocationCallback callback;
     //the last received location
-    //TODO: check if actually needed
     private Location lastLocation;
 
     //the data provide from which we will get our data
