@@ -17,6 +17,8 @@ package org.jugendhackt.camera_warner.Utils;
 
 import android.net.Uri;
 
+import org.jugendhackt.camera_warner.Data.JuvenalDataProvider;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -32,11 +34,6 @@ import okhttp3.OkHttpClient;
  */
 public class NetworkUtils {
 
-    //the urls to get the data from the two online apis
-    //TODO: move to coresponding classes
-    public final static String LOCAL_DATABASE_URL = "http://172.16.107.61/cameras.php";
-    public final static String JUVENAL = "http://www.juvenal.org/api/cameras";
-
     /**
      * Gets the data from the api of Juvenal.org This access is packaged into a seperate Method because a speciel Header field has to be set.
      * @return The data retrieved from the api as a String in JSON format.
@@ -45,7 +42,7 @@ public class NetworkUtils {
     {
         OkHttpClient client = new OkHttpClient();
         okhttp3.Request request = new okhttp3.Request.Builder()
-                .url(JUVENAL)
+                .url(JuvenalDataProvider.URL)
                 .header("Accept", "application/vnd.geo+json")
                 .build();
 
