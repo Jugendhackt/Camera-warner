@@ -1,5 +1,7 @@
 package org.jugendhackt.camera_warner.Data;
 
+import android.location.Location;
+
 import org.jugendhackt.camera_warner.Data.Camera;
 
 import java.util.List;
@@ -22,19 +24,17 @@ public interface DataProvider {
 
     /**
      * Only get the camera that is nearest to the specified location
-     * @param latitude the latitude of the location
-     * @param longitude the longitude of the location
+     * @param location the location relative which the camera is looked up
      * @return the camera nearest to the specified location
      */
-    public Camera getNearestCamera(double latitude, double longitude);
+    public Camera getNearestCamera(Location location);
 
     /**
      * Calculates the distance to the nearest camera to the specified location
-     * @param latitude the latitude of the location
-     * @param longitude the longitude of the location
+     * @param location the location relative to which the distance to the nearest camera is returned
      * @return the distance to the nearest camera in meters
      */
-    public float distanceToNearestCamera(double latitude, double longitude);
+    public float distanceToNearestCamera(Location location);
 
     /**
      * Only get the cameras that are in the specified radius from the specified location

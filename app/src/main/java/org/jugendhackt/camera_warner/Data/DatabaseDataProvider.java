@@ -49,15 +49,15 @@ public class DatabaseDataProvider implements DataProvider {
     }
 
     @Override
-    public Camera getNearestCamera(double latitude, double longitude) {
-        return LocationUtils.getNearestTo(latitude, longitude, camerasCache);
+    public Camera getNearestCamera(Location location) {
+        return LocationUtils.getNearestTo(location, camerasCache);
 
     }
 
     @Override
-    public float distanceToNearestCamera(double latitude, double longitude) {
-        Camera nearestCamera = getNearestCamera(latitude, longitude);
-        return LocationUtils.distanceBetween(latitude, longitude, nearestCamera.getLatitude(), nearestCamera.getLongitude());
+    public float distanceToNearestCamera(Location location) {
+        Camera nearestCamera = getNearestCamera(location);
+        return LocationUtils.distanceBetween(location, nearestCamera);
     }
 
     @Override

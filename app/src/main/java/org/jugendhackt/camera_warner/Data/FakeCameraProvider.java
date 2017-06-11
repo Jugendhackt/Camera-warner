@@ -1,5 +1,7 @@
 package org.jugendhackt.camera_warner.Data;
 
+import android.location.Location;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,12 +25,12 @@ public class FakeCameraProvider implements DataProvider{
     }
 
     @Override
-    public Camera getNearestCamera(double latitude, double longitude) {
+    public Camera getNearestCamera(Location location) {
         return cameras[1];
     }
 
     @Override
-    public float distanceToNearestCamera(double latitude, double longitude) {
+    public float distanceToNearestCamera(Location location) {
         return 42;
     }
 

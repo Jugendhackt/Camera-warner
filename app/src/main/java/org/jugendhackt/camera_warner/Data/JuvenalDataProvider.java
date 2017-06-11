@@ -1,5 +1,7 @@
 package org.jugendhackt.camera_warner.Data;
 
+import android.location.Location;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,17 +59,17 @@ public class JuvenalDataProvider implements DataProvider {
     }
 
     @Override
-    public Camera getNearestCamera(double latitude, double longitude) {
+    public Camera getNearestCamera(Location location) {
         if (camerasCache == null) {
             camerasCache = forceFetch();
         }
-        return LocationUtils.getNearestTo(latitude, longitude, camerasCache);
+        return LocationUtils.getNearestTo(location, camerasCache);
     }
 
     @Override
-    public float distanceToNearestCamera(double latitude, double longitude) {
-        Camera nearestCamera = getNearestCamera(latitude, longitude);
-        return LocationUtils.distanceBetween(latitude, longitude, nearestCamera.getLatitude(), nearestCamera.getLongitude());
+    public float distanceToNearestCamera(Location location) {
+        Camera nearestCamera = getNearestCamera(location);
+        return LocationUtils.distanceBetween(location, nearestCamera);
     }
 
     @Override
