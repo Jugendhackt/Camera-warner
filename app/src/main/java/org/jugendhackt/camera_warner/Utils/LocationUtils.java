@@ -16,6 +16,7 @@ import java.util.List;
 public class LocationUtils {
 
     //TODO: provide additional more needed and usefull wrappers (for Location and Camera)
+    //TODO: redocument missing functions
 
     /**
      * This method provides the Camera out of the list that is nearest to the given location
@@ -43,6 +44,11 @@ public class LocationUtils {
         return nearest;
     }
 
+    public static Camera getNearestTo(Location location, List<Camera> cameras)
+    {
+        return getNearestTo(location.getLatitude(), location.getLongitude(), cameras);
+    }
+
     /**
      * Returns the distance between two locations in m
      * @param latitude1 latitude of the 1st location
@@ -60,4 +66,13 @@ public class LocationUtils {
         return result[0];
     }
 
+    public static float distanceBetween(double latitude, double lonitude, Camera camera)
+    {
+        return distanceBetween(latitude, lonitude, camera.getLatitude(), camera.getLongitude());
+    }
+
+    public static float distanceBetween(Location location, Camera camera)
+    {
+        return distanceBetween(location.getLatitude(), location.getLongitude(), camera.getLatitude(), camera.getLongitude());
+    }
 }
