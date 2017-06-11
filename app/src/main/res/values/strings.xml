@@ -35,4 +35,7 @@
     <string name="action_settings" >@string/title_activity_settings</string>
     <string name="action_add_camera" >Add a new Camera</string>
 
+    <string name="notification_camera_warning_title">There\'s a camera near you</string>
+    <string name="notification_camera_warning_content">A camera has been found inside the radius you defined.</string>
+
 </resources>
