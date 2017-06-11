@@ -81,7 +81,7 @@ public class LocationService extends Service {
         callback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                Log.d("LocationService", "getLocation");
+                Log.d("LocationService", "gotLocation");
                 lastLocation = locationResult.getLastLocation();
 
                 sendLastLocationToActivity();
