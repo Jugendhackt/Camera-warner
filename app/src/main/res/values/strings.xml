@@ -38,4 +38,14 @@
     <string name="notification_camera_warning_title">There\'s a camera near you</string>
     <string name="notification_camera_warning_content">A camera has been found inside the radius you defined.</string>
 
+    <string name="data_provider_juvenal">Juvenal.org Data</string>
+    <string name="data_provider_custom">Custom Data</string>
+    <string name="data_provider_dummy">Dummy Data</string>
+    <string name="data_provider_juvenal_values">juvenal</string>
+    <string name="data_provider_custom_values">custom</string>
+    <string name="data_provider_dummy_values">dummy</string>
+    
+    <string name="data_provider_key">data_provider_selectin</string>
+    <string name="data_provider_title">Select the dataprovider(s)</string>
+    <string name="data_provider_default">@string/data_provider_juvenal_values</string>
 </resources>

@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <EditTextPreference
         android:key="@string/pref_radius_key"
         android:title="@string/pref_radius_label"
         tools:summary="Set the size of the radius"
         android:defaultValue="@string/pref_radius_default" />
+
+    <!--
+    <MultiSelectListPreference
+        android:key="@string/data_provider_key"
+        android:title="@string/data_provider_title"
+        android:entries="@array/data_providers_entries"
+        android:entryValues="@array/data_providers_entryValues"
+        android:defaultValue="@string/data_provider_default"/> -->
 
     <CheckBoxPreference
         android:defaultValue="@bool/pref_active_default"
