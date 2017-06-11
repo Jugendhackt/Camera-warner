@@ -16,6 +16,8 @@ import java.util.List;
  */
 public interface DataProvider {
 
+    //TODO: user Task<List<Camera> as type
+
     /**
      * Check if data has been cached
      * @return if data is cached
