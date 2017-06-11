@@ -4,13 +4,13 @@
     <array name="data_providers_entryValues">
         <item>@string/data_provider_juvenal_values</item>
         <item>@string/data_provider_custom_values</item>
-        <item>@string/data_provider_juvenal_values</item>
+        <item>@string/data_provider_dummy_values</item>
     </array>
     
     <array name="data_providers_entries">
         <item>@string/data_provider_juvenal</item>
         <item>@string/data_provider_custom</item>
-        <item>@string/data_provider_juvenal</item>
+        <item>@string/data_provider_dummy</item>
     </array>
     
 </resources>

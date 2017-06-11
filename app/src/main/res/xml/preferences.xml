@@ -9,13 +9,12 @@
         tools:summary="Set the size of the radius"
         android:defaultValue="@string/pref_radius_default" />
 
-    <!--
     <MultiSelectListPreference
         android:key="@string/data_provider_key"
         android:title="@string/data_provider_title"
         android:entries="@array/data_providers_entries"
         android:entryValues="@array/data_providers_entryValues"
-        android:defaultValue="@string/data_provider_default"/> -->
+        android:defaultValue="@string/data_provider_default"/>
 
     <CheckBoxPreference
         android:defaultValue="@bool/pref_active_default"

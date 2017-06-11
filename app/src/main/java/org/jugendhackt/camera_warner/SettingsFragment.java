@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import android.support.v14.preference.MultiSelectListPreference;
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.ListPreference;
@@ -59,7 +60,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
             Preference p = prefScreen.getPreference(i);
             // You don't need to set up preference summaries for checkbox preferences because
             // they are already set up in xml using summaryOff and summary On
-            if (!(p instanceof CheckBoxPreference)) {
+            if (!(p instanceof CheckBoxPreference) && !(p instanceof MultiSelectListPreference)) {
                 String value = sharedPreferences.getString(p.getKey(), "");
                 setPreferenceSummary(p, value);
             }
@@ -80,7 +81,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
         if (null != preference) {
             // You don't need to set up preference summaries for checkbox preferences because
             // they are already set up in xml using summaryOff and summary On
-            if (!(preference instanceof CheckBoxPreference)) {
+            if (!(preference instanceof CheckBoxPreference) && !(preference instanceof MultiSelectListPreference)) {
                 String value = sharedPreferences.getString(preference.getKey(), "");
                 setPreferenceSummary(preference, value);
             }
