@@ -141,7 +141,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (radiusCircle != null) {
             radiusCircle.remove();
         }
-        radiusCircle = mMap.addCircle(new CircleOptions().center(locationMarker.getPosition()).radius(Double.parseDouble(PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.pref_radius_key), "100"))).fillColor(Color.argb(195, 102, 147, 173)));
+        radiusCircle = mMap.addCircle(new CircleOptions().center(locationMarker.getPosition()).radius(Double.parseDouble(PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default)))).fillColor(Color.argb(195, 102, 147, 173)));
     }
 
     /**
