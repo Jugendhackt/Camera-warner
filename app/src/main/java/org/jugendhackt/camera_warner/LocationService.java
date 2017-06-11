@@ -1,14 +1,22 @@
 package org.jugendhackt.camera_warner;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
@@ -57,6 +65,13 @@ public class LocationService extends Service {
     //TODO: remove because the dataproviders are already implementing caching
     private List<Camera> allCamerasCache = new LinkedList<>();
 
+    //This notification ID can be used to access our notification after we've displayed it. This
+    //can be handy when we need to cancel the notification, or perhaps update it. This number is
+    //arbitrary and can be set to whatever you like.
+    private static final int CAMERA_WARNING_NOTIFICATION_ID = 1243;
+
+    public static double radius;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -68,7 +83,7 @@ public class LocationService extends Service {
         callback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                Log.e("LocationService", "getLocation");
+                Log.d("LocationService", "getLocation");
                 lastLocation = locationResult.getLastLocation();
 
                 sendLastLocationToActivity();
@@ -76,7 +91,7 @@ public class LocationService extends Service {
                 if (allCamerasCache != null) {
                     if(provider.distanceToNearestCamera(lastLocation) < Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default))))
                     {
-                        Log.e(TAG, "a camera is to near");
+                        Log.d(TAG, "a camera is to near");
                     }
                 }
             }
@@ -100,7 +115,7 @@ public class LocationService extends Service {
                     public void onSuccess(Location location) {
                         if (location != null) {
                             lastLocation = location;
-                            Log.e(TAG, "sending last location");
+                            Log.d(TAG, "sending last location");
                             sendLastLocationToActivity();
                         }
                     }
@@ -118,9 +133,9 @@ public class LocationService extends Service {
         new Thread() {
             @Override
             public void run() {
-                Log.e(TAG, "gettingData");
+                Log.d(TAG, "gettingData");
                 allCamerasCache = provider.getAllCameras();
-                Log.e(TAG, "gotData");
+                Log.d(TAG, "gotData");
 
                 sendAllCamerasCacheToActivity();
             }
@@ -156,6 +171,46 @@ public class LocationService extends Service {
         sendBroadcast(intent);
     }
 
+    /**
+     * Notifies the user that is a camera inside the radius of him that he defined
+     */
+    private void sendCameraWarning()
+    {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                .setSmallIcon(R.drawable.ic_warning_black_24dp)
+                //.setLargeIcon()
+                .setContentTitle(this.getString(R.string.notification_camera_warning_title))
+                .setContentText(this.getString(R.string.notification_camera_warning_content))
+                .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle().bigText(this.getString(R.string.notification_camera_warning_content)))
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setAutoCancel(true)
+                .setContentIntent(contentIntent());
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            builder.setPriority(Notification.PRIORITY_HIGH);
+        }
+
+        NotificationManager notificationManager = (NotificationManager)
+                this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        /* CAMERA_WARNING_NOTIFICATION_ID allows you to update or cancel the notification later on */
+        notificationManager.notify(CAMERA_WARNING_NOTIFICATION_ID, builder.build());
+    }
+
+    /**
+     * Returns a pendingIntent to start the MapsActivity (main activity)
+     * @return a pendingIntent to start the MapsActivity
+     */
+    private PendingIntent contentIntent() {
+        Intent startActivityIntent = new Intent(this, MapsActivity.class);
+        return PendingIntent.getActivity(
+                this,
+                CAMERA_WARNING_NOTIFICATION_ID,
+                startActivityIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
     @Override
     public void onDestroy() {
         //properly remove the callback
@@ -166,6 +221,7 @@ public class LocationService extends Service {
 
     /**
      * not used
+     *
      * @param intent
      * @return
      */
