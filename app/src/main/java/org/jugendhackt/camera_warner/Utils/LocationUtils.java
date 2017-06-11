@@ -15,8 +15,6 @@ import java.util.List;
  */
 public class LocationUtils {
 
-    //TODO: provide additional more needed and usefull wrappers (for Location and Camera)
-    //TODO: redocument missing functions
 
     /**
      * This method provides the Camera out of the list that is nearest to the given location
@@ -44,6 +42,12 @@ public class LocationUtils {
         return nearest;
     }
 
+    /**
+     * Wrapper  for {@link #getNearestTo(double, double, List)}
+     * @param location the location to which the nearest camera will be returned
+     * @param cameras a list of cameras out which the nearest will be returned
+     * @return the nearst camera
+     */
     public static Camera getNearestTo(Location location, List<Camera> cameras)
     {
         return getNearestTo(location.getLatitude(), location.getLongitude(), cameras);
@@ -66,11 +70,36 @@ public class LocationUtils {
         return result[0];
     }
 
+    /**
+     * A wrapper for {@link #distanceBetween(double, double, double, double)}
+     * @param latitude the latitude of the 1st location
+     * @param lonitude the longitude of the 1st location
+     * @param camera the camera (2nd location)
+     * @return the distance between the 1st location and the camera
+     */
     public static float distanceBetween(double latitude, double lonitude, Camera camera)
     {
         return distanceBetween(latitude, lonitude, camera.getLatitude(), camera.getLongitude());
     }
 
+    /**
+     * A wrapper for {@link #distanceBetween(double, double, double, double)}
+     * @param location the 1st location
+     * @param latitude2 the latitude of the 2nd location
+     * @param longitude2 the longitude of the 2nd location
+     * @return the distance beteen the 1st and 2nd location
+     */
+    public static float distanceBetween(Location location, double latitude2, double longitude2)
+    {
+        return distanceBetween(location.getLatitude(), location.getLongitude(), latitude2 ,longitude2);
+    }
+
+    /**
+     * A wrapper for {@link #getNearestTo(double, double, List)}
+     * @param location the 1st location
+     * @param camera the camera (2nd location)
+     * @return the distance between the 1st location and the camera
+     */
     public static float distanceBetween(Location location, Camera camera)
     {
         return distanceBetween(location.getLatitude(), location.getLongitude(), camera.getLatitude(), camera.getLongitude());
