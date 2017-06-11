@@ -10,6 +10,7 @@ import org.jugendhackt.camera_warner.Utils.NetworkUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -22,8 +23,12 @@ import java.util.List;
  */
 public class DatabaseDataProvider implements DataProvider {
 
+
+    //the url where this database is located at
+    public final static String URL = "http://172.16.107.61/cameras.php";
+
     //to avoid having to fetch the data every time
-    private static List<Camera> camerasCache;
+    private static List<Camera> camerasCache = new LinkedList<>();
 
     /**
      * Actually loads data from the data source
@@ -31,13 +36,18 @@ public class DatabaseDataProvider implements DataProvider {
      */
     private List<Camera> forceFetch() {
         try {
-            return parseFromJSONArray(new JSONArray(NetworkUtils.getResponseFromHttpUrl(NetworkUtils.LOCAL_DATABASE_URL)));
+            return parseFromJSONArray(new JSONArray(NetworkUtils.getResponseFromHttpUrl(URL)));
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public boolean hasData() {
+        return camerasCache.size() != 0;
     }
 
     @Override

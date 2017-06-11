@@ -9,6 +9,7 @@ import org.jugendhackt.camera_warner.Utils.LocationUtils;
 import org.jugendhackt.camera_warner.Utils.NetworkUtils;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -21,8 +22,11 @@ import java.util.List;
  */
 public class JuvenalDataProvider implements DataProvider {
 
+    //the url where this database is located at
+    public final static String URL = "http://www.juvenal.org/api/cameras";
+
     //to avoid having to fetch the data every time
-    private static List<Camera> camerasCache;
+    private static List<Camera> camerasCache = new LinkedList<>();
 
     /**
      * Actually loads data from the data source
@@ -47,6 +51,11 @@ public class JuvenalDataProvider implements DataProvider {
             }
         }
         return cameras;
+    }
+
+    @Override
+    public boolean hasData() {
+        return camerasCache.size() != 0;
     }
 
     @Override

@@ -20,6 +20,11 @@ public class FakeCameraProvider implements DataProvider{
     private Camera[] cameras = {new Camera(-31, 142), new Camera(53.563, 9.971), new Camera(0, 0)};
 
     @Override
+    public boolean hasData() {
+        return true;
+    }
+
+    @Override
     public List<Camera> getAllCameras() {
         return new LinkedList<>(Arrays.asList(cameras));
     }

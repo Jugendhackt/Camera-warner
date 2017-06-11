@@ -17,6 +17,12 @@ import java.util.List;
 public interface DataProvider {
 
     /**
+     * Check if data has been cached
+     * @return if data is cached
+     */
+    public boolean hasData();
+
+    /**
      * This Method should return all the cameras the data source has available as a list
      * @return a list of all the available cameras
      */
