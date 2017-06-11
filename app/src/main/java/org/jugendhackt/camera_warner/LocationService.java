@@ -62,8 +62,6 @@ public class LocationService extends Service {
 
     //the data provide from which we will get our data
     private DataProvider provider;
-    //TODO: remove because the dataproviders are already implementing caching
-    private List<Camera> allCamerasCache = new LinkedList<>();
 
     //This notification ID can be used to access our notification after we've displayed it. This
     //can be handy when we need to cancel the notification, or perhaps update it. This number is
@@ -88,9 +86,11 @@ public class LocationService extends Service {
 
                 sendLastLocationToActivity();
 
-                if (allCamerasCache != null) {
-                    if(provider.distanceToNearestCamera(lastLocation) < Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default))))
+                if (provider.hasData()) {
+                    if(provider.distanceToNearestCamera(lastLocation) < Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default)))
+                            && PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getString(R.string.pref_active_key), getResources().getBoolean(R.bool.pref_active_default)))
                     {
+                        sendCameraWarning();
                         Log.d(TAG, "a camera is to near");
                     }
                 }
@@ -134,7 +134,7 @@ public class LocationService extends Service {
             @Override
             public void run() {
                 Log.d(TAG, "gettingData");
-                allCamerasCache = provider.getAllCameras();
+                provider.getAllCameras();
                 Log.d(TAG, "gotData");
 
                 sendAllCamerasCacheToActivity();
@@ -153,7 +153,7 @@ public class LocationService extends Service {
     private void sendAllCamerasCacheToActivity() {
         Intent intent = new Intent();
         intent.setAction(getResources().getString(R.string.broadcast_camera));
-        ArrayList<Camera> cameras = new ArrayList<>(allCamerasCache);
+        ArrayList<Camera> cameras = new ArrayList<>(provider.getAllCameras());
         intent.putParcelableArrayListExtra("list", cameras);
         intent.setPackage("org.jugendhackt.camera_warner");
         sendBroadcast(intent);
