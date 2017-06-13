@@ -8,15 +8,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.os.Binder;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
@@ -30,11 +26,13 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import org.jugendhackt.camera_warner.Data.Camera;
 import org.jugendhackt.camera_warner.Data.DataProvider;
 import org.jugendhackt.camera_warner.Data.DatabaseDataProvider;
+import org.jugendhackt.camera_warner.Data.FakeCameraProvider;
 import org.jugendhackt.camera_warner.Data.JuvenalDataProvider;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -60,14 +58,13 @@ public class LocationService extends Service {
     private Location lastLocation;
 
     //the data provide from which we will get our data
-    private DataProvider provider;
+    //private DataProvider provider;
+    private List<DataProvider> providers = new LinkedList<>();
 
     //This notification ID can be used to access our notification after we've displayed it. This
     //can be handy when we need to cancel the notification, or perhaps update it. This number is
     //arbitrary and can be set to whatever you like.
     private static final int CAMERA_WARNING_NOTIFICATION_ID = 1243;
-
-    public static double radius;
 
     @Override
     public void onCreate() {
@@ -83,29 +80,41 @@ public class LocationService extends Service {
                 Log.d("LocationService", "gotLocation");
                 lastLocation = locationResult.getLastLocation();
 
-                sendLastLocationToActivity();
+                for(DataProvider thisProvider : providers)
+                {
+                    if (thisProvider.hasData()) {
+                        sendAllCamerasCacheToActivity(thisProvider);
 
-                if (provider.hasData()) {
-                    if(provider.distanceToNearestCamera(lastLocation) < Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default)))
-                            && PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getString(R.string.pref_active_key), getResources().getBoolean(R.bool.pref_active_default)))
-                    {
-                        sendCameraWarning();
-                        Log.d(TAG, "a camera is to near");
+                        if (thisProvider.distanceToNearestCamera(lastLocation) < Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default)))
+                                && PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getString(R.string.pref_active_key), getResources().getBoolean(R.bool.pref_active_default))) {
+                            sendCameraWarning();
+                            Log.d(TAG, "a camera is to near");
+                        }
                     }
                 }
+
             }
         };
-
-        //the DataProvider; any can be inserted here
-        //TODO: make the selectable in the settings
-        //or
-        //TODO: add multiple ones
-        provider = new JuvenalDataProvider();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand");
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        Set<String> selections = preferences.getStringSet(getString(R.string.data_provider_key), null);
+        for (String string : selections) {
+            DataProvider provider = null;
+            if (string.equals(getString(R.string.data_provider_juvenal_values))) {
+                provider = new JuvenalDataProvider();
+            } else if (string.equals(getString(R.string.data_provider_dummy_values))) {
+                provider = new FakeCameraProvider();
+            } else if (string.equals(getString(R.string.data_provider_custom_values))) {
+                provider = new DatabaseDataProvider();
+            }
+            providers.add(provider);
+            Log.d(TAG, string);
+        }
 
         //try to initialize lastLocation with the systems last known location until we have a gps position
         mClient.getLastLocation()
@@ -133,10 +142,12 @@ public class LocationService extends Service {
             @Override
             public void run() {
                 Log.d(TAG, "gettingData");
-                provider.getAllCameras();
+                for (DataProvider provider : providers) {
+                    provider.getAllCameras();
+                    sendAllCamerasCacheToActivity(provider);
+                }
                 Log.d(TAG, "gotData");
 
-                sendAllCamerasCacheToActivity();
             }
         }.start();
 
@@ -149,7 +160,7 @@ public class LocationService extends Service {
     /**
      * Broacast all cameras. Only internally in this packet
      */
-    private void sendAllCamerasCacheToActivity() {
+    private void sendAllCamerasCacheToActivity(DataProvider provider) {
         Intent intent = new Intent();
         intent.setAction(getResources().getString(R.string.broadcast_camera));
         ArrayList<Camera> cameras = new ArrayList<>(provider.getAllCameras());
@@ -173,8 +184,7 @@ public class LocationService extends Service {
     /**
      * Notifies the user that is a camera inside the radius of him that he defined
      */
-    private void sendCameraWarning()
-    {
+    private void sendCameraWarning() {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                 .setSmallIcon(R.drawable.ic_warning_black_24dp)
@@ -199,6 +209,7 @@ public class LocationService extends Service {
 
     /**
      * Returns a pendingIntent to start the MapsActivity (main activity)
+     *
      * @return a pendingIntent to start the MapsActivity
      */
     private PendingIntent contentIntent() {
