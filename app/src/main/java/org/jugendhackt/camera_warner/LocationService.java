@@ -66,7 +66,6 @@ public class LocationService extends Service {
             providers.add(provider);
 
             serviceCallbacks.newData();
-            //sendAllCamerasCacheToActivity(provider);
         }
     }
 
@@ -108,9 +107,6 @@ public class LocationService extends Service {
                 for(DataProvider thisProvider : providers)
                 {
                     if (thisProvider.hasData()) {
-                        //sendAllCamerasCacheToActivity(thisProvider);
-                        serviceCallbacks.newData();
-
                         if (thisProvider.distanceToNearestCamera(lastLocation) < Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default)))
                                 && PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getString(R.string.pref_active_key), getResources().getBoolean(R.bool.pref_active_default))) {
                             sendCameraWarning();
@@ -151,7 +147,6 @@ public class LocationService extends Service {
                             lastLocation = location;
                             Log.d(TAG, "sending last location");
                             serviceCallbacks.postionUpdate();
-                            //sendLastLocationToActivity();
                         }
                     }
                 });
