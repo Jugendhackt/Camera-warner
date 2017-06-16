@@ -2,13 +2,17 @@ package org.jugendhackt.camera_warner;
 
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
@@ -28,10 +32,12 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.jugendhackt.camera_warner.Data.Camera;
+import org.jugendhackt.camera_warner.Data.DataProvider;
+import org.jugendhackt.camera_warner.Data.ServiceCallbacks;
 
 import java.util.List;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, ServiceCallbacks {
 
     //TODO: add (proper) documentation
 
@@ -45,6 +51,26 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private BroadcastReceiver receiver1;
 
     private boolean followed;
+
+    private LocationService myService;
+    private boolean bound = false;
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // cast the IBinder and get MyService instance
+            LocationService.LocalBinder binder = (LocationService.LocalBinder) service;
+            myService = binder.getService();
+            bound = true;
+            myService.setCallback(MapsActivity.this); // register
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            bound = false;
+            myService = null;
+        }
+    };
 
     @Override
     protected void onDestroy() {
@@ -162,5 +188,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         for (Camera camera : data) {
             addCamera(camera);
         }
+    }
+
+    private void attachCallback() {
+        bindService(new Intent(this, LocationService.class), serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void newData() {
+        for(DataProvider provider : myService.providers)
+        {
+            addData(provider.getAllCameras());
+        }
+    }
+
+    @Override
+    public void postionUpdate() {
+        updateLocationOnMap(myService.lastLocation);
     }
 }
