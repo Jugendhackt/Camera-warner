@@ -72,6 +72,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        if(bound)
+        {
+            myService.setCallback(null);
+        }
     }
 
     @Override
