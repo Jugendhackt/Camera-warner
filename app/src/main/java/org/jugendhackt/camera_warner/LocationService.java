@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -29,6 +30,7 @@ import org.jugendhackt.camera_warner.Data.DataProvider;
 import org.jugendhackt.camera_warner.Data.DatabaseDataProvider;
 import org.jugendhackt.camera_warner.Data.FakeCameraProvider;
 import org.jugendhackt.camera_warner.Data.JuvenalDataProvider;
+import org.jugendhackt.camera_warner.Data.ServiceCallbacks;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -242,15 +244,21 @@ public class LocationService extends Service {
         super.onDestroy();
     }
 
-    /**
-     * not used
-     *
-     * @param intent
-     * @return
-     */
-    @Nullable
+    private final IBinder binder = new LocalBinder();
+    private ServiceCallbacks serviceCallbacks;
+
     @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    public IBinder onBind(Intent p1) {
+        return binder;
+    }
+
+    public class LocalBinder extends Binder {
+        public LocationService getService() {
+            return LocationService.this;
+        }
+    }
+
+    public void setCallback(ServiceCallbacks serviceCallbacks) {
+        this.serviceCallbacks = serviceCallbacks;
     }
 }
