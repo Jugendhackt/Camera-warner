@@ -18,6 +18,8 @@ public interface DataProvider {
 
     //TODO: user Task<List<Camera> as type
 
+    public void fetchData();
+
     /**
      * Check if data has been cached
      * @return if data is cached

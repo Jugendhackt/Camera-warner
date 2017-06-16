@@ -46,6 +46,11 @@ public class DatabaseDataProvider implements DataProvider {
     }
 
     @Override
+    public void fetchData() {
+        camerasCache = forceFetch();
+    }
+
+    @Override
     public boolean hasData() {
         return !camerasCache.isEmpty();
     }
