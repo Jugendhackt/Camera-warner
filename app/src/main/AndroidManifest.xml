@@ -56,8 +56,7 @@
             android:label="@string/title_activity_login" />
         
         <service android:name=".LocationService"
-            android:exported="false"
-            android:process=":service"/>
+            android:exported="false" />
     </application>
 
 </manifest>
