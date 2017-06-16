@@ -53,10 +53,10 @@
         </activity>
         <activity
             android:name=".LoginActivity"
-            android:label="@string/title_activity_login"></activity>
+            android:label="@string/title_activity_login" />
         
         <service android:name=".LocationService"
-            android:exported="true"
+            android:exported="false"
             android:process=":service"/>
     </application>
 
