@@ -79,11 +79,11 @@ public class LocationService extends Service {
     //called for the location updates; needed to properly unregister the callback
     private LocationCallback callback;
     //the last received location
-    private Location lastLocation;
+    public Location lastLocation;
 
     //the data provide from which we will get our data
     //private DataProvider provider;
-    private List<DataProvider> providers = new LinkedList<>();
+    public List<DataProvider> providers = new LinkedList<>();
 
     //This notification ID can be used to access our notification after we've displayed it. This
     //can be handy when we need to cancel the notification, or perhaps update it. This number is
