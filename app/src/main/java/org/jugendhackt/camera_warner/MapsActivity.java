@@ -30,6 +30,8 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import org.jugendhackt.camera_warner.Data.Camera;
 import org.jugendhackt.camera_warner.Data.DataProvider;
@@ -48,6 +50,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Circle radiusCircle;
 
     private boolean followed;
+
+    private ClusterManager<Camera> myClusterManager;
 
     private LocationService myService;
     private boolean bound = false;
@@ -68,6 +72,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             myService = null;
         }
     };
+
+    private void setupCluster()
+    {
+        myClusterManager = new ClusterManager<Camera>(this, mMap);
+        myClusterManager.setRenderer(new MyCustomRender(this, mMap, myClusterManager));
+
+        mMap.setOnCameraIdleListener(myClusterManager);
+        mMap.setOnMarkerClickListener(myClusterManager);
+    }
 
     @Override
     protected void onDestroy() {
@@ -159,11 +172,27 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        setupCluster();
+    }
+
+    private class MyCustomRender extends DefaultClusterRenderer<Camera> {
+
+
+        public MyCustomRender(Context context, GoogleMap map, ClusterManager<Camera> clusterManager) {
+            super(context, map, clusterManager);
+        }
+
+        @Override
+        protected void onBeforeClusterItemRendered(Camera item, MarkerOptions markerOptions) {
+            markerOptions.title("Eine Kamera").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+        }
     }
 
     private void addData(List<Camera> data) {
+        myClusterManager.addItems(data);
+
         for (Camera camera : data) {
-            addCamera(camera);
+            //addCamera(camera);
         }
     }
 
@@ -173,6 +202,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void newData() {
+        if(myClusterManager != null)
+        {
+            myClusterManager.clearItems();
+        }
+
         for(DataProvider provider : myService.providers)
         {
             addData(provider.getAllCameras());

@@ -1,7 +1,11 @@
 package org.jugendhackt.camera_warner.Data;
 
+import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
 
 /**
  * Created by Julian Mundhahs on 10.06.2017.
@@ -9,7 +13,7 @@ import android.os.Parcelable;
 /**
  * This Class is the Data class to store single cameras;
  */
-public class Camera implements Parcelable{
+public class Camera implements Parcelable, ClusterItem{
 
     //latitude and longitude of the corresponding camera
     private double latitude;
@@ -89,5 +93,10 @@ public class Camera implements Parcelable{
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeDouble(latitude);
         dest.writeDouble(longitude);
+    }
+
+    @Override
+    public LatLng getPosition() {
+        return new LatLng(latitude, longitude);
     }
 }
