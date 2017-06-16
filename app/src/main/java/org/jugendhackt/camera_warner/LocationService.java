@@ -176,30 +176,6 @@ public class LocationService extends Service {
     }
 
     /**
-     * Broacast all cameras. Only internally in this packet
-     */
-    private void sendAllCamerasCacheToActivity(DataProvider provider) {
-        Intent intent = new Intent();
-        intent.setAction(getResources().getString(R.string.broadcast_camera));
-        ArrayList<Camera> cameras = new ArrayList<>(provider.getAllCameras());
-        intent.putParcelableArrayListExtra("list", cameras);
-        intent.setPackage("org.jugendhackt.camera_warner");
-        sendBroadcast(intent);
-    }
-
-    /**
-     * Broacast the location in lastLocation. Only internally in this packet
-     */
-    private void sendLastLocationToActivity() {
-        Intent intent = new Intent();
-        intent.setAction(getResources().getString(R.string.broadcast_location));
-        intent.putExtra("latitude", lastLocation.getLatitude());
-        intent.putExtra("longitude", lastLocation.getLongitude());
-        intent.setPackage("org.jugendhackt.camera_warner");
-        sendBroadcast(intent);
-    }
-
-    /**
      * Notifies the user that is a camera inside the radius of him that he defined
      */
     private void sendCameraWarning() {

@@ -47,9 +47,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Marker locationMarker;
     private Circle radiusCircle;
 
-    private BroadcastReceiver receiver;
-    private BroadcastReceiver receiver1;
-
     private boolean followed;
 
     private LocationService myService;
@@ -74,8 +71,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onDestroy() {
-        unregisterReceiver(receiver);
-        unregisterReceiver(receiver1);
         super.onDestroy();
     }
 
@@ -88,33 +83,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(getResources().getString(R.string.broadcast_camera));
-        receiver = new android.content.BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.d(TAG, "received Cameras");
-                addData(intent.<Camera>getParcelableArrayListExtra("list"));
-            }
-        };
-        this.registerReceiver(receiver, filter);
-
-        IntentFilter filter1 = new IntentFilter();
-        filter1.addAction(getResources().getString(R.string.broadcast_location));
-        receiver1 = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.d(TAG, "recived Location");
-                Location location = new Location("");
-                location.setLatitude(intent.getDoubleExtra("latitude", 0));
-                location.setLongitude(intent.getDoubleExtra("longitude", 0));
-                updateLocationOnMap(location);
-            }
-        };
-        this.registerReceiver(receiver1, filter1);
-
         Intent intent = new Intent(this, LocationService.class);
         startService(intent);
+
+        attachCallback();
     }
 
     @Override
