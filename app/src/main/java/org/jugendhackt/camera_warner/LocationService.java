@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -44,6 +45,27 @@ import java.util.Set;
  * All data that is received is broadcasted. If additional data (e.g. list of cameras is needed) the ui can start service. The data will then again be broadcasted from {@link #onStartCommand}
  */
 public class LocationService extends Service {
+
+    private class FillDataProvider extends AsyncTask<DataProvider, Void, DataProvider>
+    {
+
+        @Override
+        protected DataProvider doInBackground(DataProvider... params) {
+            DataProvider provider = params[0];
+
+            provider.fetchData();
+            return provider;
+        }
+
+        @Override
+        protected void onPostExecute(DataProvider provider) {
+            super.onPostExecute(provider);
+
+            providers.add(provider);
+
+            sendAllCamerasCacheToActivity(provider);
+        }
+    }
 
     //logging
     public static final String TAG = "LocationService";
@@ -137,19 +159,10 @@ public class LocationService extends Service {
         //actually request the location updates
         mClient.requestLocationUpdates(request, callback, null);
 
-        //TODO: we're not on the main thread; deactivate network on main thread
-        new Thread() {
-            @Override
-            public void run() {
-                Log.d(TAG, "gettingData");
-                for (DataProvider provider : providers) {
-                    provider.getAllCameras();
-                    sendAllCamerasCacheToActivity(provider);
-                }
-                Log.d(TAG, "gotData");
-
-            }
-        }.start();
+        for(DataProvider provider : providers)
+        {
+            new FillDataProvider().execute(provider);
+        }
 
         Log.d(TAG, "started Service");
 
