@@ -48,8 +48,7 @@ import java.util.Set;
  */
 public class LocationService extends Service {
 
-    private class FillDataProvider extends AsyncTask<DataProvider, Void, DataProvider>
-    {
+    private class FillDataProvider extends AsyncTask<DataProvider, Void, DataProvider> {
 
         @Override
         protected DataProvider doInBackground(DataProvider... params) {
@@ -65,7 +64,21 @@ public class LocationService extends Service {
 
             providers.add(provider);
 
+            notifyUIOfnewData();
+        }
+    }
+
+    private void notifyUIOfnewData()
+    {
+        if (serviceCallbacks != null) {
             serviceCallbacks.newData();
+        }
+    }
+
+    private void notifyUIOfnewPosition()
+    {
+        if (serviceCallbacks != null) {
+            serviceCallbacks.postionUpdate();
         }
     }
 
@@ -103,9 +116,9 @@ public class LocationService extends Service {
             public void onLocationResult(LocationResult locationResult) {
                 Log.d("LocationService", "gotLocation");
                 lastLocation = locationResult.getLastLocation();
+                notifyUIOfnewPosition();
 
-                for(DataProvider thisProvider : providers)
-                {
+                for (DataProvider thisProvider : providers) {
                     if (thisProvider.hasData()) {
                         if (thisProvider.distanceToNearestCamera(lastLocation) < Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default)))
                                 && PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getString(R.string.pref_active_key), getResources().getBoolean(R.bool.pref_active_default))) {
@@ -146,7 +159,7 @@ public class LocationService extends Service {
                         if (location != null) {
                             lastLocation = location;
                             Log.d(TAG, "sending last location");
-                            serviceCallbacks.postionUpdate();
+                            notifyUIOfnewPosition();
                         }
                     }
                 });
@@ -159,8 +172,7 @@ public class LocationService extends Service {
         //actually request the location updates
         mClient.requestLocationUpdates(request, callback, null);
 
-        for(DataProvider provider : providers)
-        {
+        for (DataProvider provider : providers) {
             new FillDataProvider().execute(provider);
         }
 
