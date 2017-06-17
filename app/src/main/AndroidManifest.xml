@@ -44,10 +44,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.jugendhackt.camera_warner.MapsActivity" />
         </activity>
-        <activity
-            android:name=".LoginActivity"
-            android:label="@string/title_activity_login" />
-        
+
         <service android:name=".LocationService"
             android:exported="false" />
     </application>

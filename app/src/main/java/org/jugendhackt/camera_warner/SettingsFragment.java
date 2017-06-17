@@ -38,20 +38,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
         // Add preferences, defined in the XML file in res->xml->preferences.xml
         addPreferencesFromResource(R.xml.preferences);
 
-        //use Preference element as button; attaching onClick listener here
-        //note: the button is currently disabled
-        Preference Button = findPreference(getString(R.string.pref_login_key));
-        Button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-
-                Intent intent = new Intent(getContext(), LoginActivity.class);
-                startActivity(intent);
-                return true;
-            }
-        });
-
-
         //set the summaries for the different preferences for the first time
         SharedPreferences sharedPreferences = getPreferenceScreen().getSharedPreferences();
         PreferenceScreen prefScreen = getPreferenceScreen();
