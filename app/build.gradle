@@ -5,7 +5,7 @@ android {
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "org.jugendhackt.camera_warner"
-        minSdkVersion 16
+        minSdkVersion 14
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -27,13 +27,18 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.3.1'
+
+    //better and flatter layout hierarchy type
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    //show a map and work with it
     compile 'com.google.android.gms:play-services-maps:11.0.1'
-    compile 'com.google.android.gms:play-services-location:11.0.1'
-    compile 'com.android.support:preference-v14:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.squareup.okhttp3:okhttp:3.8.0'
     compile 'com.google.maps.android:android-maps-utils:0.4.4'
+    //access user's location
+    compile 'com.google.android.gms:play-services-location:11.0.1'
+    //settings
+    compile 'com.android.support:preference-v14:25.3.1'
+    //networking
+    compile 'com.squareup.okhttp3:okhttp:3.8.0'
+
     testCompile 'junit:junit:4.12'
 }
