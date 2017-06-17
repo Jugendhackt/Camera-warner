@@ -1,22 +1,18 @@
 package org.jugendhackt.camera_warner;
 
 
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -75,7 +71,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void setupCluster()
     {
-        myClusterManager = new ClusterManager<Camera>(this, mMap);
+        myClusterManager = new ClusterManager<>(this, mMap);
         myClusterManager.setRenderer(new MyCustomRender(this, mMap, myClusterManager));
 
         mMap.setOnCameraIdleListener(myClusterManager);
@@ -131,21 +127,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         return super.onOptionsItemSelected(item);
     }
 
-    private void addCamera(LatLng location) {
-        mMap.addMarker(new MarkerOptions().position(location).title("Eine Kamera").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
-    }
-
-    private void addCamera(Camera camera) {
-        addCamera(new LatLng(camera.getLatitude(), camera.getLongitude()));
+    private void attachCallback() {
+        bindService(new Intent(this, LocationService.class), serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     private void updateLocationOnMap(@NonNull Location location) {
         if (locationMarker != null) {
             locationMarker.remove();
         }
-        Log.d(TAG, String.valueOf(location.getAccuracy()));
-        Log.d(TAG, String.valueOf(location.getLatitude()));
-        Log.d(TAG, String.valueOf(location.getLongitude()));
+
         LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
         if (!followed) {
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
@@ -190,31 +180,29 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void addData(List<Camera> data) {
         myClusterManager.addItems(data);
-
-        for (Camera camera : data) {
-            //addCamera(camera);
-        }
     }
 
-    private void attachCallback() {
-        bindService(new Intent(this, LocationService.class), serviceConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    @Override
-    public void newData() {
+    private void clearItems()
+    {
         if(myClusterManager != null)
         {
             myClusterManager.clearItems();
         }
+    }
 
-        for(DataProvider provider : myService.providers)
+
+    @Override
+    public void newData() {
+        clearItems();
+
+        for(DataProvider provider : myService.getProviders())
         {
             addData(provider.getAllCameras());
         }
     }
 
     @Override
-    public void postionUpdate() {
-        updateLocationOnMap(myService.lastLocation);
+    public void positionUpdate() {
+        updateLocationOnMap(myService.getLastLocation());
     }
 }

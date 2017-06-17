@@ -9,5 +9,5 @@ public interface ServiceCallbacks {
      * Indicates to the listener that the backupLog has changed
      */
     void newData();
-    void postionUpdate();
+    void positionUpdate();
 }
