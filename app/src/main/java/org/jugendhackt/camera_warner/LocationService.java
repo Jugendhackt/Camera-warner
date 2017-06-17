@@ -116,8 +116,6 @@ public class LocationService extends Service {
                 provider = new JuvenalDataProvider();
             } else if (string.equals(getString(R.string.data_provider_dummy_values))) {
                 provider = new FakeCameraProvider();
-            } else if (string.equals(getString(R.string.data_provider_custom_values))) {
-                provider = new DatabaseDataProvider();
             }
             providers.add(provider);
         }
