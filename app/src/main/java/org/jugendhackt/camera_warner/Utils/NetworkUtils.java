@@ -15,14 +15,11 @@
  */
 package org.jugendhackt.camera_warner.Utils;
 
-import android.net.Uri;
-
-import org.jugendhackt.camera_warner.Data.JuvenalDataProvider;
+import org.jugendhackt.camera_warner.Data.Providers.JuvenalDataProvider;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 

@@ -1,4 +1,4 @@
-package org.jugendhackt.camera_warner;
+package org.jugendhackt.camera_warner.Services;
 
 import android.Manifest;
 import android.app.Notification;
@@ -26,11 +26,12 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-import org.jugendhackt.camera_warner.Data.DataProvider;
-import org.jugendhackt.camera_warner.Data.DatabaseDataProvider;
-import org.jugendhackt.camera_warner.Data.FakeCameraProvider;
-import org.jugendhackt.camera_warner.Data.JuvenalDataProvider;
-import org.jugendhackt.camera_warner.Data.ServiceCallbacks;
+import org.jugendhackt.camera_warner.Data.Providers.DataProvider;
+import org.jugendhackt.camera_warner.Data.Providers.FakeCameraProvider;
+import org.jugendhackt.camera_warner.Data.Providers.JuvenalDataProvider;
+import org.jugendhackt.camera_warner.MapsActivity;
+import org.jugendhackt.camera_warner.R;
+import org.jugendhackt.camera_warner.ServiceCallbacks;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -220,8 +221,8 @@ public class LocationService extends Service {
         return binder;
     }
 
-    class LocalBinder extends Binder {
-        LocationService getService() {
+    public class LocalBinder extends Binder {
+        public LocationService getService() {
             return LocationService.this;
         }
     }

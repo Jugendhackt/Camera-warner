@@ -1,10 +1,12 @@
-package org.jugendhackt.camera_warner;
+package org.jugendhackt.camera_warner.Preferences;
 
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+
+import org.jugendhackt.camera_warner.R;
 
 /**
  * Created by Julian Mundhahs on 10.06.2017.

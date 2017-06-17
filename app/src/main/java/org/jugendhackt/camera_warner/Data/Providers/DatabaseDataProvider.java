@@ -1,10 +1,11 @@
-package org.jugendhackt.camera_warner.Data;
+package org.jugendhackt.camera_warner.Data.Providers;
 
 import android.location.Location;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jugendhackt.camera_warner.Data.Model.Camera;
 import org.jugendhackt.camera_warner.Utils.LocationUtils;
 import org.jugendhackt.camera_warner.Utils.NetworkUtils;
 

@@ -37,7 +37,7 @@
             android:value="${api_key}" />
 
         <activity
-            android:name=".SettingsActivity"
+            android:name=".Preferences.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".MapsActivity">
             <meta-data
@@ -45,7 +45,7 @@
                 android:value="org.jugendhackt.camera_warner.MapsActivity" />
         </activity>
 
-        <service android:name=".LocationService"
+        <service android:name=".Services.LocationService"
             android:exported="false" />
     </application>
 

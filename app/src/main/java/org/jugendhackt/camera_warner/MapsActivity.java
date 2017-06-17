@@ -29,9 +29,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
-import org.jugendhackt.camera_warner.Data.Camera;
-import org.jugendhackt.camera_warner.Data.DataProvider;
-import org.jugendhackt.camera_warner.Data.ServiceCallbacks;
+import org.jugendhackt.camera_warner.Data.Model.Camera;
+import org.jugendhackt.camera_warner.Data.Providers.DataProvider;
+import org.jugendhackt.camera_warner.Preferences.SettingsActivity;
+import org.jugendhackt.camera_warner.Services.LocationService;
 
 import java.util.List;
 

@@ -2,7 +2,7 @@ package org.jugendhackt.camera_warner.Utils;
 
 import android.location.Location;
 
-import org.jugendhackt.camera_warner.Data.Camera;
+import org.jugendhackt.camera_warner.Data.Model.Camera;
 
 import java.util.List;
 

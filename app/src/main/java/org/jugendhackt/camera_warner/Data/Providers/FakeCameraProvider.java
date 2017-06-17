@@ -1,6 +1,8 @@
-package org.jugendhackt.camera_warner.Data;
+package org.jugendhackt.camera_warner.Data.Providers;
 
 import android.location.Location;
+
+import org.jugendhackt.camera_warner.Data.Model.Camera;
 
 import java.util.Arrays;
 import java.util.LinkedList;

@@ -1,4 +1,4 @@
-package org.jugendhackt.camera_warner.Data;
+package org.jugendhackt.camera_warner;
 
 /**
  * Created by Julian Mundhahs on 16.06.2017.

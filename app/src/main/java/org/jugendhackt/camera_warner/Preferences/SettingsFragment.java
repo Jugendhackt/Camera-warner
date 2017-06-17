@@ -1,4 +1,4 @@
-package org.jugendhackt.camera_warner;
+package org.jugendhackt.camera_warner.Preferences;
 
 /**
  * Created by Martin Goetze on 10.06.2017.
@@ -16,6 +16,8 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
 import android.widget.Toast;
+
+import org.jugendhackt.camera_warner.R;
 
 /**
  * This Fragment class implements the setting's custom logic (e.g. check data for validity and set preference summaries)

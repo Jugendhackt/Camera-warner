@@ -1,6 +1,5 @@
-package org.jugendhackt.camera_warner.Data;
+package org.jugendhackt.camera_warner.Data.Model;
 
-import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 
