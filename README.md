@@ -10,4 +10,4 @@ You can set the radius in which you will be notified in the settings as well as 
 - Use the compiled apks from the downlaod section
 - Build the app on your own
 
-  Note: You have to replace the google maps api key with you own. They're in /res/values/debug/google_maps_api.xml and /res/values/release/google_maps_api.xml See the [Google Maps Documentation](https://developers.google.com/maps/documentation/android-api/signup?hl=de) for how to get an api key.
+  Note: You have to replace the google maps api key with you own. Just set the value in the app's build.gradle in android/manifestPlaceholders. See the [Google Maps Documentation](https://developers.google.com/maps/documentation/android-api/signup?hl=de) for how to get an api key.
