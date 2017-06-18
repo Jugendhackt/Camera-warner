@@ -15,15 +15,16 @@
  */
 package org.jugendhackt.camera_warner.Utils;
 
-import org.jugendhackt.camera_warner.Data.Providers.JuvenalDataProvider;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Scanner;
 
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
 /**
  * These utilities will be used to communicate with the network.
@@ -31,17 +32,24 @@ import okhttp3.OkHttpClient;
  */
 public class NetworkUtils {
 
-    /**
-     * Gets the data from the api of Juvenal.org This access is packaged into a seperate Method because a speciel Header field has to be set.
-     * @return The data retrieved from the api as a String in JSON format.
-     */
-    public static String getResponseFromJuvenal()
+    public static final MediaType GeoJSON = MediaType.parse("application/vnd.geo+json");
+    public static final MediaType OverpassQL = MediaType.parse("application/overpassql");
+
+    public static String getResponseWithPost(String url, MediaType mediaType, String requestBody)
+    {
+        RequestBody body = RequestBody.create(mediaType, requestBody);
+
+        okhttp3.Request request = new okhttp3.Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+
+        return fetchDataFromRequest(request);
+    }
+
+    private static String fetchDataFromRequest(Request request)
     {
         OkHttpClient client = new OkHttpClient();
-        okhttp3.Request request = new okhttp3.Request.Builder()
-                .url(JuvenalDataProvider.URL)
-                .header("Accept", "application/vnd.geo+json")
-                .build();
 
         String returnVale = null;
         try {
@@ -50,6 +58,24 @@ public class NetworkUtils {
             e.printStackTrace();
         }
         return returnVale;
+    }
+
+    public static String getResponseFromURL(String url)
+    {
+        return getResponseFromURL(url, null);
+    }
+
+    public static String getResponseFromURL(String url, MediaType accept)
+    {
+        okhttp3.Request.Builder builder = new okhttp3.Request.Builder()
+                .url(url);
+
+        if(accept!=null)
+        {
+            builder.header("Accept", accept.toString());
+        }
+
+        return fetchDataFromRequest(builder.build());
     }
 
     /**

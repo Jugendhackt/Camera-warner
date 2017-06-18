@@ -24,7 +24,7 @@ import java.util.List;
 public class JuvenalDataProvider implements DataProvider {
 
     //the url where this database is located at
-    public final static String URL = "http://www.juvenal.org/api/cameras";
+    private final static String URL = "http://www.juvenal.org/api/cameras";
 
     //to avoid having to fetch the data every time
     private static List<Camera> camerasCache = new LinkedList<>();
@@ -36,7 +36,7 @@ public class JuvenalDataProvider implements DataProvider {
     private List<Camera> forceFetch() {
         JSONArray result = new JSONArray();
         try {
-            result = new JSONObject(NetworkUtils.getResponseFromJuvenal()).getJSONArray("features");
+            result = new JSONObject(NetworkUtils.getResponseFromURL(URL, NetworkUtils.GeoJSON)).getJSONArray("features");
         } catch (JSONException e) {
             e.printStackTrace();
         }
