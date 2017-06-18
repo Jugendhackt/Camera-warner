@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="action_add_camera">Neue Kamera hinzufügen</string>
-    <string name="action_sign_in">Einloggen oder Registrieren</string>
-    <string name="action_sign_in_short">Einliggen</string>
-    <string name="error_field_required">Dieses Feld wird benötigt</string>
-    <string name="error_incorrect_password">Dieses Passwort ist falsch</string>
-    <string name="error_invalid_email">Diese E-Mail-Adresse ist ungültig</string>
-    <string name="error_invalid_password">Dieses Passwort ist zu kurz</string>
-    <string name="notification_camera_warning_content">Eine Kamera wurde in dem von Ihnen definierten Radius gefunden.</string>
+    <string name="notification_camera_warning_content">Eine Kamera wurde in dem von dir definierten Radius gefunden.</string>
     <string name="notification_camera_warning_title">Es gibt eine Kamera in deiner Nähe</string>
     <string name="data_provider_title">Wählen Sie den / die Dataprovider</string>
     <string name="data_provider_dummy">Test Daten</string>
@@ -15,9 +9,10 @@
     <string name="data_provider_osm">OpenStreetMaps Daten</string>
     <string name="pref_active_summary_off">Sie werden nicht benachrichtigt, wenn Sie in der Nähe einer Kamera sind</string>
     <string name="pref_active_summary_on">Sie werden benachrichtigt, wenn Sie in der Nähe einer Kamera sind</string>
-    <string name="pref_login_label">Anmelden</string>
-    <string name="prompt_password">Passwort (optional)</string>
-    <string name="title_activity_login">Anmelden</string>
     <string name="title_activity_maps">Kameras</string>
     <string name="title_activity_settings">Einstellungen</string>
+    <string name="pref_radius_label" translatable="false">Radius</string>
+    <string name="pref_active_label">Benachrichtigungen senden</string>
+    <string name="data_provider_juvenal">Juvenal.org Daten</string>
+    <string name="app_name">Kamera Warner</string>
 </resources>

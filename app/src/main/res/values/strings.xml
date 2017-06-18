@@ -1,35 +1,20 @@
 <resources>
-    <string name="app_name" translatable="false">Camera-warner</string>
+    <string name="app_name">Camera Alerter</string>
     <string name="title_activity_maps">Cameras</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="title_activity_login">Login</string>
-
-    <!-- Strings related to login -->
-    <string name="prompt_email" translatable="false">Email</string>
-    <string name="prompt_password">Password (optional)</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale" translatable="false">"Contacts permissions are needed for providing email
-        completions."
-    </string>
 
     <string name="broadcast_camera" translatable="false">org.jugendhackt.camera_warner.cameras</string>
     <string name="broadcast_location" translatable="false">org.jugendhackt.camera_warner.location</string>
 
     <string name="pref_radius_key" translatable="false">pref_radius</string>
-    <string name="pref_radius_label" translatable="false">Radius</string>
+    <string name="pref_radius_label">Radius</string>
     <string name="pref_radius_default" translatable="false">200</string>
 
     <string name="pref_active_key" translatable="false">pref_active</string>
+    <string name="pref_active_label">Send Notifications</string>
     <string name="pref_active_summary_off">You wont be notified if you\'re near a camera</string>
     <string name="pref_active_summary_on">Notifications will be sent if you\'re near a camera</string>
 
-    <string name="pref_login_key" translatable="false">pref_login</string>
-    <string name="pref_login_label">Log in</string>
 
     <string name="action_settings" translatable="false">@string/title_activity_settings</string>
     <string name="action_add_camera" >Add a new Camera</string>
@@ -37,7 +22,7 @@
     <string name="notification_camera_warning_title">There\'s a camera near you</string>
     <string name="notification_camera_warning_content">A camera has been found inside the radius you defined.</string>
 
-    <string name="data_provider_juvenal" translatable="false">Juvenal.org Data</string>
+    <string name="data_provider_juvenal">Juvenal.org Data</string>
     <string name="data_provider_dummy">Dummy Data</string>
     <string name="data_provider_osm">OpenStreetMaps Data</string>
     <string name="data_provider_juvenal_values" translatable="false">juvenal</string>
