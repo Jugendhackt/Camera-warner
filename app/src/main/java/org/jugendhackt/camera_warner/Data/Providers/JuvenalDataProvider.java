@@ -21,19 +21,16 @@ import java.util.List;
  * This DataProvider provides the data that is also available on juvenal.org.
  * It is blocking.
  */
-public class JuvenalDataProvider implements DataProvider {
+public class JuvenalDataProvider extends AbstractDataProvider{
 
-    //the url where this database is located at
-    private final static String URL = "http://www.juvenal.org/api/cameras";
-
-    //to avoid having to fetch the data every time
-    private static List<Camera> camerasCache = new LinkedList<>();
+    private static final String URL = "http://www.juvenal.org/api/cameras";
 
     /**
      * Actually loads data from the data source
      * @return the data that has been loaded
      */
-    private List<Camera> forceFetch() {
+    @Override
+    protected List<Camera> forceFetch() {
         JSONArray result = new JSONArray();
         try {
             result = new JSONObject(NetworkUtils.getResponseFromURL(URL, NetworkUtils.GeoJSON)).getJSONArray("features");
@@ -52,43 +49,5 @@ public class JuvenalDataProvider implements DataProvider {
             }
         }
         return cameras;
-    }
-
-    @Override
-    public void fetchData() {
-        camerasCache = forceFetch();
-    }
-
-    @Override
-    public boolean hasData() {
-        return !camerasCache.isEmpty();
-    }
-
-    @Override
-    public List<Camera> getAllCameras() {
-        if (camerasCache.isEmpty()) {
-            camerasCache = forceFetch();
-        }
-        return camerasCache;
-
-    }
-
-    @Override
-    public Camera getNearestCamera(Location location) {
-        if (camerasCache.isEmpty()) {
-            camerasCache = forceFetch();
-        }
-        return LocationUtils.getNearestTo(location, camerasCache);
-    }
-
-    @Override
-    public float distanceToNearestCamera(Location location) {
-        Camera nearestCamera = getNearestCamera(location);
-        return LocationUtils.distanceBetween(location, nearestCamera);
-    }
-
-    @Override
-    public List<Camera> getCamerasInRange(double latitude, double longitude, int radius) {
-        return null;
     }
 }
