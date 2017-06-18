@@ -29,7 +29,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import org.jugendhackt.camera_warner.Data.Providers.DataProvider;
 import org.jugendhackt.camera_warner.Data.Providers.FakeCameraProvider;
 import org.jugendhackt.camera_warner.Data.Providers.JuvenalDataProvider;
-import org.jugendhackt.camera_warner.Data.Providers.OSMProvider;
+import org.jugendhackt.camera_warner.Data.Providers.OSMDataProvider;
 import org.jugendhackt.camera_warner.MapsActivity;
 import org.jugendhackt.camera_warner.R;
 import org.jugendhackt.camera_warner.ServiceCallbacks;
@@ -119,7 +119,7 @@ public class LocationService extends Service {
             } else if (string.equals(getString(R.string.data_provider_dummy_values))) {
                 provider = new FakeCameraProvider();
             } else if (string.equals(getString(R.string.data_provider_osm_values))) {
-                provider = new OSMProvider();
+                provider = new OSMDataProvider();
             }
             providers.add(provider);
         }

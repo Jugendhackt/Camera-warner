@@ -18,7 +18,7 @@ import java.util.List;
  * Created by Julian Mundhahs on 18.06.2017.
  */
 
-public class OSMProvider implements DataProvider {
+public class OSMDataProvider implements DataProvider {
 
     //the url where this database is located at
     private static final String URL = "http://overpass-api.de/api/interpreter";
