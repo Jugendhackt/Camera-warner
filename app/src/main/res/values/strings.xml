@@ -40,8 +40,10 @@
 
     <string name="data_provider_juvenal">Juvenal.org Data</string>
     <string name="data_provider_dummy">Dummy Data</string>
+    <string name="data_provider_osm">OpenStreetMaps Data</string>
     <string name="data_provider_juvenal_values">juvenal</string>
     <string name="data_provider_dummy_values">dummy</string>
+    <string name="data_provider_osm_values">osm</string>
     
     <string name="data_provider_key">data_provider_selectin</string>
     <string name="data_provider_title">Select the dataprovider(s)</string>
