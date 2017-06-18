@@ -19,19 +19,14 @@ import java.util.List;
 
 public abstract class AbstractDataProvider implements DataProvider {
 
-    protected final String URL = getURL();
-
     //to avoid having to fetch the data every time
     protected static List<Camera> camerasCache = new LinkedList<>();
-
 
     /**
      * Actually loads data from the data source
      * @return the data that has been loaded
      */
     protected abstract List<Camera> forceFetch();
-
-    protected abstract String getURL();
 
     @Override
     public void fetchData() {
