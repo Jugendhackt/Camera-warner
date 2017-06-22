@@ -3,9 +3,6 @@
     <string name="title_activity_maps">Cameras</string>
     <string name="title_activity_settings">Settings</string>
 
-    <string name="broadcast_camera" translatable="false">org.jugendhackt.camera_warner.cameras</string>
-    <string name="broadcast_location" translatable="false">org.jugendhackt.camera_warner.location</string>
-
     <string name="pref_radius_key" translatable="false">pref_radius</string>
     <string name="pref_radius_label">Radius</string>
     <string name="pref_radius_default" translatable="false">200</string>
@@ -29,7 +26,7 @@
     <string name="data_provider_dummy_values">dummy</string>
     <string name="data_provider_osm_values" translatable="false">osm</string>
     
-    <string name="data_provider_key" translatable="false">data_provider_selectin</string>
+    <string name="data_provider_key" translatable="false">data_provider_selection</string>
     <string name="data_provider_title">Select the dataprovider(s)</string>
     <string name="data_provider_default" translatable="false">@string/data_provider_juvenal_values</string>
 </resources>
