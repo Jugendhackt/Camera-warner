@@ -7,9 +7,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
 /**
- * Created by Julian Mundhahs on 10.06.2017.
- */
-/**
  * This Class is the Data class to store single cameras;
  */
 public class Camera implements Parcelable, ClusterItem{
@@ -45,6 +42,12 @@ public class Camera implements Parcelable, ClusterItem{
     public double getLongitude()
     {
         return longitude;
+    }
+
+
+    @Override
+    public LatLng getPosition() {
+        return new LatLng(latitude, longitude);
     }
 
     //the rest is only needed for the class to be parelable
@@ -92,10 +95,5 @@ public class Camera implements Parcelable, ClusterItem{
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeDouble(latitude);
         dest.writeDouble(longitude);
-    }
-
-    @Override
-    public LatLng getPosition() {
-        return new LatLng(latitude, longitude);
     }
 }
