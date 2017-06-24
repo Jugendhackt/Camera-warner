@@ -38,10 +38,7 @@ import java.util.List;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, ServiceCallbacks {
 
-    //TODO: add (proper) documentation
-
     private GoogleMap mMap;
-    static String TAG = "MapsActivity";
 
     private Marker locationMarker;
     private Circle radiusCircle;
@@ -80,13 +77,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
 
         if(bound)
         {
             myService.setCallback(null);
             unbindService(serviceConnection);
+            bound = false;
         }
     }
 
@@ -101,6 +99,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         Intent intent = new Intent(this, LocationService.class);
         startService(intent);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
 
         attachCallback();
     }
@@ -189,6 +192,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if(myClusterManager != null)
         {
             myClusterManager.clearItems();
+            mMap.clear();
+            myClusterManager.cluster();
         }
     }
 
