@@ -20,7 +20,7 @@ import java.util.List;
 public abstract class AbstractDataProvider implements DataProvider {
 
     //to avoid having to fetch the data every time
-    protected static List<Camera> camerasCache = new LinkedList<>();
+    private List<Camera> camerasCache = new LinkedList<>();
 
     /**
      * Actually loads data from the data source
@@ -30,7 +30,9 @@ public abstract class AbstractDataProvider implements DataProvider {
 
     @Override
     public void fetchData() {
-        camerasCache = forceFetch();
+        if (camerasCache.isEmpty()) {
+            camerasCache = forceFetch();
+        }
     }
 
     @Override
