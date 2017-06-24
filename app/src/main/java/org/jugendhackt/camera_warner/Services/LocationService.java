@@ -18,6 +18,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.preference.PreferenceManager;
+import android.util.Log;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -33,6 +34,7 @@ import org.jugendhackt.camera_warner.Data.Providers.OSMDataProvider;
 import org.jugendhackt.camera_warner.MapsActivity;
 import org.jugendhackt.camera_warner.R;
 import org.jugendhackt.camera_warner.ServiceCallbacks;
+import org.jugendhackt.camera_warner.Utils.DataProviderManager;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -59,7 +61,7 @@ public class LocationService extends Service {
             super.onPostExecute(provider);
 
             providers.add(provider);
-            notifyUIOfnewData();
+            notifyUIOfNewData();
         }
     }
 
@@ -71,6 +73,8 @@ public class LocationService extends Service {
     private LocationCallback callback;
     //the last received location
     private Location lastLocation;
+
+    private DataProviderManager manager = new DataProviderManager();
 
     //the data provide from which we will get our data
     //private DataProvider provider;
@@ -85,6 +89,8 @@ public class LocationService extends Service {
     public void onCreate() {
         super.onCreate();
 
+        Log.d("serviec", "create");
+
         mClient = LocationServices.getFusedLocationProviderClient(this);
 
         //implementation of the location update callback
@@ -93,9 +99,10 @@ public class LocationService extends Service {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 lastLocation = locationResult.getLastLocation();
-                notifyUIOfnewPosition();
+                notifyUIOfNewPosition();
 
-                for (DataProvider provider : providers) {
+                //for (DataProvider provider : providers) {
+                for(DataProvider provider : manager.getDataProviders()) {
                     if (provider.hasData()) {
                         if (provider.distanceToNearestCamera(lastLocation) < Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default)))
                                 && PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getString(R.string.pref_active_key), getResources().getBoolean(R.bool.pref_active_default))) {
@@ -110,9 +117,12 @@ public class LocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d("LocationService", "startCommand");
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         Set<String> selections = preferences.getStringSet(getString(R.string.data_provider_key), null);
+        manager.disableAll();
         for (String string : selections) {
+            Log.d("LocationService", "Initializing: " + string);
             DataProvider provider = null;
             if (string.equals(getString(R.string.data_provider_juvenal_values))) {
                 provider = new JuvenalDataProvider();
@@ -121,8 +131,10 @@ public class LocationService extends Service {
             } else if (string.equals(getString(R.string.data_provider_osm_values))) {
                 provider = new OSMDataProvider();
             }
-            providers.add(provider);
+            manager.add(provider, string);
+            //providers.add(provider);
         }
+        notifyUIOfNewData();
 
         //defines what and who often location updates should be received
         LocationRequest request = new LocationRequest()
@@ -138,7 +150,7 @@ public class LocationService extends Service {
                         public void onSuccess(Location location) {
                             if (location != null) {
                                 lastLocation = location;
-                                notifyUIOfnewPosition();
+                                notifyUIOfNewPosition();
                             }
                         }
                     });
@@ -148,7 +160,8 @@ public class LocationService extends Service {
         }
 
 
-        for (DataProvider provider : providers) {
+        //for (DataProvider provider : providers) {
+        for(DataProvider provider : manager.getAllDataProviders()) {
             new FillDataProviderTask().execute(provider);
         }
 
@@ -164,14 +177,14 @@ public class LocationService extends Service {
         super.onDestroy();
     }
 
-    private void notifyUIOfnewData() {
+    private void notifyUIOfNewData() {
         if (serviceCallbacks != null) {
             serviceCallbacks.newData();
         }
     }
 
-    private void notifyUIOfnewPosition() {
-        if (serviceCallbacks != null) {
+    private void notifyUIOfNewPosition() {
+        if (serviceCallbacks != null && lastLocation != null) {
             serviceCallbacks.positionUpdate();
         }
     }
@@ -232,6 +245,11 @@ public class LocationService extends Service {
 
     public void setCallback(ServiceCallbacks serviceCallbacks) {
         this.serviceCallbacks = serviceCallbacks;
+
+        if (serviceCallbacks != null) {
+            notifyUIOfNewPosition();
+            notifyUIOfNewData();
+        }
     }
 
     public Location getLastLocation() {
@@ -239,6 +257,7 @@ public class LocationService extends Service {
     }
 
     public List<DataProvider> getProviders() {
-        return providers;
+        return manager.getDataProviders();
+        //return providers;
     }
 }
