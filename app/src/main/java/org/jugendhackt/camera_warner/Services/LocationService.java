@@ -101,7 +101,6 @@ public class LocationService extends Service {
                 lastLocation = locationResult.getLastLocation();
                 notifyUIOfNewPosition();
 
-                //for (DataProvider provider : providers) {
                 for(DataProvider provider : manager.getDataProviders()) {
                     if (provider.hasData()) {
                         if (provider.distanceToNearestCamera(lastLocation) < Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default)))
@@ -132,7 +131,6 @@ public class LocationService extends Service {
                 provider = new OSMDataProvider();
             }
             manager.add(provider, string);
-            //providers.add(provider);
         }
         notifyUIOfNewData();
 
@@ -159,8 +157,6 @@ public class LocationService extends Service {
             mClient.requestLocationUpdates(request, callback, null);
         }
 
-
-        //for (DataProvider provider : providers) {
         for(DataProvider provider : manager.getAllDataProviders()) {
             new FillDataProviderTask().execute(provider);
         }
@@ -258,6 +254,5 @@ public class LocationService extends Service {
 
     public List<DataProvider> getProviders() {
         return manager.getDataProviders();
-        //return providers;
     }
 }
