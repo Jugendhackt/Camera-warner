@@ -1,6 +1,7 @@
 package org.jugendhackt.camera_warner.Data.Providers;
 
 import android.location.Location;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,8 +33,16 @@ public class JuvenalDataProvider extends AbstractDataProvider{
     @Override
     protected List<Camera> forceFetch() {
         JSONArray result = new JSONArray();
+        String resultStr = NetworkUtils.getResponseFromURL(URL, NetworkUtils.GeoJSON);
+
+        if(resultStr == null || resultStr.length() == 0)
+        {
+            Log.d("JuvenalDataProvider", "fetch failed");
+            return new LinkedList<>();
+        }
+
         try {
-            result = new JSONObject(NetworkUtils.getResponseFromURL(URL, NetworkUtils.GeoJSON)).getJSONArray("features");
+            result = new JSONObject(resultStr).getJSONArray("features");
         } catch (JSONException e) {
             e.printStackTrace();
         }
