@@ -147,6 +147,7 @@ public class LocationService extends Service implements Observer {
     public void onDestroy() {
         //properly remove the callback
         mClient.removeLocationUpdates(callback);
+        manager.deleteObserver(this);
 
         super.onDestroy();
     }
