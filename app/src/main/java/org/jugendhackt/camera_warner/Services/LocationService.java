@@ -38,32 +38,15 @@ import org.jugendhackt.camera_warner.Utils.DataProviderManager;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Set;
 
 /**
  * This Service is supposed to be running in the background permanently to be able to notify the user of any cctv in their surrounding.
  * All data that is received is broadcasted. If additional data (e.g. list of cameras is needed) the ui can start service. The data will then again be broadcasted from {@link #onStartCommand}
  */
-public class LocationService extends Service {
-
-    private class FillDataProviderTask extends AsyncTask<DataProvider, Void, DataProvider> {
-
-        @Override
-        protected DataProvider doInBackground(DataProvider... params) {
-            DataProvider provider = params[0];
-
-            provider.fetchData();
-            return provider;
-        }
-
-        @Override
-        protected void onPostExecute(DataProvider provider) {
-            super.onPostExecute(provider);
-
-            providers.add(provider);
-            notifyUIOfNewData();
-        }
-    }
+public class LocationService extends Service implements Observer {
 
     //the interval in which the service wishes to be notified of the users location (expected, min)
     static int INTERVAL = 1000 * 15;
@@ -74,11 +57,7 @@ public class LocationService extends Service {
     //the last received location
     private Location lastLocation;
 
-    private DataProviderManager manager = new DataProviderManager();
-
-    //the data provide from which we will get our data
-    //private DataProvider provider;
-    private List<DataProvider> providers = new LinkedList<>();
+    private DataProviderManager manager;
 
     //This notification ID can be used to access our notification after we've displayed it. This
     //can be handy when we need to cancel the notification, or perhaps update it. This number is
@@ -89,7 +68,10 @@ public class LocationService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        Log.d("serviec", "create");
+        Log.d("service", "create");
+
+        manager = new DataProviderManager();
+        manager.addObserver(this);
 
         mClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -101,7 +83,7 @@ public class LocationService extends Service {
                 lastLocation = locationResult.getLastLocation();
                 notifyUIOfNewPosition();
 
-                for(DataProvider provider : manager.getDataProviders()) {
+                for (DataProvider provider : manager.getDataProviders()) {
                     if (provider.hasData()) {
                         if (provider.distanceToNearestCamera(lastLocation) < Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default)))
                                 && PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getString(R.string.pref_active_key), getResources().getBoolean(R.bool.pref_active_default))) {
@@ -155,10 +137,6 @@ public class LocationService extends Service {
 
             //actually request the location updates
             mClient.requestLocationUpdates(request, callback, null);
-        }
-
-        for(DataProvider provider : manager.getAllDataProviders()) {
-            new FillDataProviderTask().execute(provider);
         }
 
         // If we get killed, after returning from here, restart
@@ -231,6 +209,11 @@ public class LocationService extends Service {
     @Override
     public IBinder onBind(Intent p1) {
         return binder;
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        notifyUIOfNewData();
     }
 
     public class LocalBinder extends Binder {

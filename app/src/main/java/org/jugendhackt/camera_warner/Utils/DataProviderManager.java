@@ -1,6 +1,8 @@
 package org.jugendhackt.camera_warner.Utils;
 
+import android.os.AsyncTask;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import org.jugendhackt.camera_warner.Data.Providers.DataProvider;
 
@@ -8,8 +10,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Observable;
 
-public class DataProviderManager {
+public class DataProviderManager extends Observable{
 
     private HashMap<String, DataProvider> cameraList;
     private HashMap<String, Boolean> isActive;
@@ -23,7 +26,9 @@ public class DataProviderManager {
     private void addDataProvider(DataProvider camera, String tag)
     {
         cameraList.put(tag, camera);
-        isActive.put(tag, true);
+        isActive.put(tag, false);
+
+        new FillDataProviderTask().execute(new FillDataProviderTaskParams(camera, tag));
     }
 
     public void addDataProvider(DataProvider camera, String tag, boolean shouldBeActive)
@@ -98,6 +103,39 @@ public class DataProviderManager {
             }
         }
         return providers;
+    }
+
+    private class FillDataProviderTask extends AsyncTask<FillDataProviderTaskParams, Void, FillDataProviderTaskParams> {
+
+        @Override
+        protected FillDataProviderTaskParams doInBackground(FillDataProviderTaskParams... params) {
+            FillDataProviderTaskParams taskParams = params[0];
+            DataProvider provider = taskParams.provider;
+
+            provider.fetchData();
+            return taskParams;
+        }
+
+        @Override
+        protected void onPostExecute(FillDataProviderTaskParams provider) {
+            super.onPostExecute(provider);
+
+            enable(provider.tag);
+            Log.d("DataProviderManager", "loaded: " + provider.tag);
+            setChanged();
+            notifyObservers();
+        }
+    }
+
+    private static class FillDataProviderTaskParams {
+        DataProvider provider;
+        String tag;
+
+        FillDataProviderTaskParams(DataProvider dataProvider, String strTag)
+        {
+            provider = dataProvider;
+            tag = strTag;
+        }
     }
 
 }
