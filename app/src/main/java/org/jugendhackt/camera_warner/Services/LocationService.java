@@ -68,7 +68,7 @@ public class LocationService extends Service implements Observer {
     public void onCreate() {
         super.onCreate();
 
-        Log.d("service", "create");
+        Log.d("LocationService", "onCreate");
 
         manager = new DataProviderManager();
         manager.addObserver(this);
@@ -94,25 +94,66 @@ public class LocationService extends Service implements Observer {
 
             }
         };
+
+        Intent startService = new Intent(this, LocationService.class);
+        startService.setAction("START");
+        PendingIntent startPendingIntent = PendingIntent.getService(this, 0, startService, 0);
+
+        Intent stopService = new Intent(this, LocationService.class);
+        stopService.setAction("STOP");
+        PendingIntent stopPendingIntent = PendingIntent.getService(this, 0, stopService, 0);
+
+        android.support.v7.app.NotificationCompat.Action stopAction =
+                new android.support.v7.app.NotificationCompat.Action.Builder(R.drawable.ic_warning_black_24dp, "Stop", stopPendingIntent)
+                        .build();
+
+        android.support.v7.app.NotificationCompat.Action startAction =
+                new android.support.v7.app.NotificationCompat.Action.Builder(R.drawable.ic_warning_black_24dp, "Start", startPendingIntent)
+                        .build();
+
+        Notification notification =
+                new android.support.v7.app.NotificationCompat.Builder(this)
+                        .addAction(stopAction)
+                        .addAction(startAction)
+                        .setSmallIcon(android.R.drawable.ic_dialog_info)
+                        .setContentTitle("LocationService")
+                        .setContentText("Use the Actions below to controll the service.")
+                        .setAutoCancel(true)
+                        .build();
+
+        startForeground(4123, notification);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d("LocationService", "startCommand");
+
+        Log.d("LocationService", "onStartCommand");
+
+        switch (intent.getAction())
+        {
+            case "STOP":
+                stopSelf();
+                break;
+            default:
+                break;
+        }
+
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         Set<String> selections = preferences.getStringSet(getString(R.string.data_provider_key), null);
         manager.disableAll();
-        for (String string : selections) {
-            Log.d("LocationService", "Initializing: " + string);
-            DataProvider provider = null;
-            if (string.equals(getString(R.string.data_provider_juvenal_values))) {
-                provider = new JuvenalDataProvider();
-            } else if (string.equals(getString(R.string.data_provider_dummy_values))) {
-                provider = new FakeCameraProvider();
-            } else if (string.equals(getString(R.string.data_provider_osm_values))) {
-                provider = new OSMDataProvider();
+        if (selections != null) {
+            for (String string : selections) {
+                Log.d("LocationService", "Initializing: " + string);
+                DataProvider provider = null;
+                if (string.equals(getString(R.string.data_provider_juvenal_values))) {
+                    provider = new JuvenalDataProvider();
+                } else if (string.equals(getString(R.string.data_provider_dummy_values))) {
+                    provider = new FakeCameraProvider();
+                } else if (string.equals(getString(R.string.data_provider_osm_values))) {
+                    provider = new OSMDataProvider();
+                }
+                manager.add(provider, string);
             }
-            manager.add(provider, string);
         }
         notifyUIOfNewData();
 
@@ -145,6 +186,8 @@ public class LocationService extends Service implements Observer {
 
     @Override
     public void onDestroy() {
+        Log.d("LocationService", "onDestroy");
+
         //properly remove the callback
         mClient.removeLocationUpdates(callback);
         manager.deleteObserver(this);
@@ -208,7 +251,14 @@ public class LocationService extends Service implements Observer {
     private ServiceCallbacks serviceCallbacks;
 
     @Override
+    public boolean onUnbind(Intent intent) {
+        Log.d("LocationService", "onUnBind");
+        return super.onUnbind(intent);
+    }
+
+    @Override
     public IBinder onBind(Intent p1) {
+        Log.d("LocationService", "onBind");
         return binder;
     }
 
