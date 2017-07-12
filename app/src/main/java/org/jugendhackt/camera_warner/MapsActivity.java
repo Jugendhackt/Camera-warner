@@ -97,8 +97,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        Intent intent = new Intent(this, LocationService.class);
-        startService(intent);
+        Intent startService = new Intent(this, LocationService.class);
+        startService.setAction("START");
+        startService(startService);
     }
 
     @Override
