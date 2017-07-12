@@ -95,6 +95,7 @@ public class LocationService extends Service implements Observer {
             }
         };
 
+        //TODO: cleanup the notification code since it is a disgrace at the moment
         Intent startService = new Intent(this, LocationService.class);
         startService.setAction("START");
         PendingIntent startPendingIntent = PendingIntent.getService(this, 0, startService, 0);
