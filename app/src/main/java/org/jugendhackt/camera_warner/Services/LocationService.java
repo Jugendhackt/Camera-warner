@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -36,7 +35,6 @@ import org.jugendhackt.camera_warner.R;
 import org.jugendhackt.camera_warner.ServiceCallbacks;
 import org.jugendhackt.camera_warner.Utils.DataProviderManager;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -59,10 +57,14 @@ public class LocationService extends Service implements Observer {
 
     private DataProviderManager manager;
 
+    private boolean notificationIsShown;
+
     //This notification ID can be used to access our notification after we've displayed it. This
     //can be handy when we need to cancel the notification, or perhaps update it. This number is
     //arbitrary and can be set to whatever you like.
     private static final int CAMERA_WARNING_NOTIFICATION_ID = 1243;
+
+    private static final int CAMERA_FOREGROUND_SERVICE_NOTIFICATION_ID = 3421;
 
     @Override
     public void onCreate() {
@@ -83,19 +85,26 @@ public class LocationService extends Service implements Observer {
                 lastLocation = locationResult.getLastLocation();
                 notifyUIOfNewPosition();
 
-                for (DataProvider provider : manager.getDataProviders()) {
-                    if (provider.hasData()) {
-                        if (provider.distanceToNearestCamera(lastLocation) < Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default)))
-                                && PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getString(R.string.pref_active_key), getResources().getBoolean(R.bool.pref_active_default))) {
-                            sendCameraWarning();
-                        }
-                    }
+                if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getString(R.string.pref_active_key), getResources().getBoolean(R.bool.pref_active_default))
+                        && manager.isCameraNearerThan(Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default))), lastLocation)) {
+                    enableCameraWarning();
+                } else {
+                    disableCamerWarning();
                 }
 
             }
         };
 
-        //TODO: cleanup the notification code since it is a disgrace at the moment
+        Notification notification =
+                prepareForegroundNotification()
+                        .setContentText(getString(R.string.service_foregroundNotification_text))
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(getString(R.string.service_foregroundNotification_bigText)))
+                        .build();
+
+        startForeground(CAMERA_FOREGROUND_SERVICE_NOTIFICATION_ID, notification);
+    }
+
+    private android.support.v4.app.NotificationCompat.Builder prepareForegroundNotification() {
         Intent startService = new Intent(this, LocationService.class);
         startService.setAction("START");
         PendingIntent startPendingIntent = PendingIntent.getService(this, 0, startService, 0);
@@ -105,24 +114,20 @@ public class LocationService extends Service implements Observer {
         PendingIntent stopPendingIntent = PendingIntent.getService(this, 0, stopService, 0);
 
         android.support.v7.app.NotificationCompat.Action stopAction =
-                new android.support.v7.app.NotificationCompat.Action.Builder(R.drawable.ic_warning_black_24dp, "Stop", stopPendingIntent)
+                new NotificationCompat.Action.Builder(R.drawable.ic_stop_black_24dp, getString(R.string.notification_foreground_action_stop_label), stopPendingIntent)
                         .build();
 
         android.support.v7.app.NotificationCompat.Action startAction =
-                new android.support.v7.app.NotificationCompat.Action.Builder(R.drawable.ic_warning_black_24dp, "Start", startPendingIntent)
+                new NotificationCompat.Action.Builder(R.drawable.ic_play_arrow_black_24dp, getString(R.string.notification_foreground_action_start_label), startPendingIntent)
                         .build();
 
-        Notification notification =
+        return
                 new android.support.v7.app.NotificationCompat.Builder(this)
                         .addAction(stopAction)
                         .addAction(startAction)
                         .setSmallIcon(android.R.drawable.ic_dialog_info)
                         .setContentTitle("LocationService")
-                        .setContentText("Use the Actions below to controll the service.")
-                        .setAutoCancel(true)
-                        .build();
-
-        startForeground(4123, notification);
+                        .setAutoCancel(true);
     }
 
     @Override
@@ -130,12 +135,14 @@ public class LocationService extends Service implements Observer {
 
         Log.d("LocationService", "onStartCommand");
 
-        switch (intent.getAction())
-        {
+        switch (intent.getAction()) {
             case "STOP":
+                Log.d("LocationService", "stoping");
+                stopForeground(true);
                 stopSelf();
                 break;
             default:
+                Log.d("LocationService", "starting/continuing");
                 break;
         }
 
@@ -182,7 +189,7 @@ public class LocationService extends Service implements Observer {
         }
 
         // If we get killed, after returning from here, restart
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     @Override
@@ -208,30 +215,46 @@ public class LocationService extends Service implements Observer {
         }
     }
 
+    private void disableCamerWarning() {
+        if (notificationIsShown) {
+            NotificationManager notificationManager = (NotificationManager)
+                    this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+            notificationManager.cancel(CAMERA_WARNING_NOTIFICATION_ID);
+
+            notificationIsShown = false;
+        }
+    }
+
     /**
      * Notifies the user that is a camera inside the radius of him that he defined
      */
-    private void sendCameraWarning() {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
-                .setSmallIcon(R.drawable.ic_warning_black_24dp)
-                //.setLargeIcon()
-                .setContentTitle(this.getString(R.string.notification_camera_warning_title))
-                .setContentText(this.getString(R.string.notification_camera_warning_content))
-                .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle().bigText(this.getString(R.string.notification_camera_warning_content)))
-                .setDefaults(Notification.DEFAULT_ALL)
-                .setAutoCancel(true)
-                .setContentIntent(contentIntent());
+    private void enableCameraWarning() {
+        if (!notificationIsShown) {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                    .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                    .setSmallIcon(R.drawable.ic_warning_black_24dp)
+                    //.setLargeIcon()
+                    .setOngoing(true)
+                    .setContentTitle(this.getString(R.string.notification_camera_warning_title))
+                    .setContentText(this.getString(R.string.notification_camera_warning_content))
+                    .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle().bigText(this.getString(R.string.notification_camera_warning_content)))
+                    .setDefaults(Notification.DEFAULT_ALL)
+                    .setAutoCancel(true)
+                    .setContentIntent(contentIntent());
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            builder.setPriority(Notification.PRIORITY_HIGH);
-        }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                builder.setPriority(Notification.PRIORITY_HIGH);
+            }
 
-        NotificationManager notificationManager = (NotificationManager)
-                this.getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManager notificationManager = (NotificationManager)
+                    this.getSystemService(Context.NOTIFICATION_SERVICE);
 
         /* CAMERA_WARNING_NOTIFICATION_ID allows you to update or cancel the notification later on */
-        notificationManager.notify(CAMERA_WARNING_NOTIFICATION_ID, builder.build());
+            notificationManager.notify(CAMERA_WARNING_NOTIFICATION_ID, builder.build());
+
+            notificationIsShown = true;
+        }
     }
 
     /**
