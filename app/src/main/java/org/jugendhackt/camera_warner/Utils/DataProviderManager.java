@@ -1,5 +1,6 @@
 package org.jugendhackt.camera_warner.Utils;
 
+import android.location.Location;
 import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -103,6 +104,18 @@ public class DataProviderManager extends Observable{
             }
         }
         return providers;
+    }
+
+    public boolean isCameraNearerThan(float distance, Location lastLocation)
+    {
+        for (DataProvider provider : getDataProviders()) {
+            if (provider.hasData()) {
+                if (provider.distanceToNearestCamera(lastLocation) < distance) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private class FillDataProviderTask extends AsyncTask<FillDataProviderTaskParams, Void, FillDataProviderTaskParams> {
