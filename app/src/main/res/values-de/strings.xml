@@ -15,4 +15,8 @@
     <string name="pref_active_label">Benachrichtigungen senden</string>
     <string name="data_provider_juvenal">Juvenal.org Daten</string>
     <string name="app_name">Kamera Warner</string>
+    <string name="service_foregroundNotification_text">Service Verwaltung</string>
+    <string name="service_foregroundNotification_bigText">Benutze die 2 Knöpfe um den Service zu verwalten</string>
+    <string name="notification_foreground_action_start_label">Starten</string>
+    <string name="notification_foreground_action_stop_label">Beenden</string>
 </resources>

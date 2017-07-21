@@ -29,4 +29,9 @@
     <string name="data_provider_key" translatable="false">data_provider_selection</string>
     <string name="data_provider_title">Select the dataprovider(s)</string>
     <string name="data_provider_default" translatable="false">@string/data_provider_juvenal_values</string>
+
+    <string name="service_foregroundNotification_text">Service Controls</string>
+    <string name="service_foregroundNotification_bigText">Use the 2 actions to control the service</string>
+    <string name="notification_foreground_action_stop_label">Stop</string>
+    <string name="notification_foreground_action_start_label">Start</string>
 </resources>
