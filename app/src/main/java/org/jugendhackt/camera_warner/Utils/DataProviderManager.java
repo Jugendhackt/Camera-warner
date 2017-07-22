@@ -13,9 +13,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 
+/**
+ * This class manages all dataproviders. It keeps every Provider that was ever loaded in memory until it is gcd. It therefore is not memory efficient.
+ *
+ * Different DataProviders can be enabled or disabled to make the hiding of some DataProviders possible.
+ */
 public class DataProviderManager extends Observable{
 
+    //contains all the DataProviders
     private HashMap<String, DataProvider> cameraList;
+    //contains which DataProvider is active
     private HashMap<String, Boolean> isActive;
 
     public DataProviderManager()
@@ -24,25 +31,39 @@ public class DataProviderManager extends Observable{
         isActive = new LinkedHashMap<>();
     }
 
+    /**
+     * Wrapper for @see {@link #addDataProvider(DataProvider, String, boolean)} Note that the DataProvider will only be loaded but not enabled with this method.
+     * @param camera The DataProvider that should be added
+     * @param tag The tag which will be used for access to the DataProvider
+     */
     private void addDataProvider(DataProvider camera, String tag)
     {
+        addDataProvider(camera, tag, false);
+    }
+
+    /**
+     * Adds the DataProvider to the list of data providers. It's data will also be loaded asynchronously.
+     * @param camera The DataProvider which will be added to the list
+     * @param tag The tag which will be used for access to the DataProvider
+     * @param shouldBeActive Whether the DataProvider should be marked as active once it is loaded
+     */
+    public void addDataProvider(DataProvider camera, String tag, boolean shouldBeActive)
+    {
         cameraList.put(tag, camera);
-        isActive.put(tag, false);
 
         new FillDataProviderTask().execute(new FillDataProviderTaskParams(camera, tag));
     }
 
-    public void addDataProvider(DataProvider camera, String tag, boolean shouldBeActive)
-    {
-        cameraList.put(tag, camera);
-        isActive.put(tag, shouldBeActive);
-    }
-
+    /**
+     * Adds DataProvider to the list with @see {@link #addDataProvider(DataProvider, String, boolean)} and lets it be enabled when finished or enables it when it already is loaded
+     * @param provider The DataProvider to be loaded and enabled
+     * @param tag The tag which will be used for access to the DataProvider
+     */
     public void add(DataProvider provider, String tag)
     {
         if(!cameraList.containsKey(tag))
         {
-            addDataProvider(provider, tag);
+            addDataProvider(provider, tag, true);
         }
         else
         {
@@ -50,11 +71,17 @@ public class DataProviderManager extends Observable{
         }
     }
 
+    /**
+     * Marks all the DataProviders as disabled.
+     */
     public void disableAll()
     {
         setAllTo(false);
     }
 
+    /**
+     * Marks all the DataProviders as enabled.
+     */
     public void enableAll()
     {
         setAllTo(true);
@@ -68,31 +95,61 @@ public class DataProviderManager extends Observable{
         }
     }
 
+    /**
+     * Querys the a DataProvider via the previously specified tag whether it is enabled or not
+     * @param tag The tag of the DataProvider
+     * @return The status of the DataProvider
+     */
     public boolean isEnabled(String tag)
     {
+        //TODO: check if the tag is valid
         return isActive.get(tag);
     }
 
+    /**
+     * Enables the DataProvider with the specified tag
+     * @param tag The tag of the DataProvider
+     */
     private void enable(String tag)
     {
+        //TODO: check if the tag is valid
         isActive.put(tag, true);
     }
 
+    /**
+     * Disables the DataProvider with the specified tag
+     * @param tag The tag of the DataProvider
+     */
     public void disable(String tag)
     {
+        //TODO: check if the tag is valid
         isActive.put(tag, false);
     }
 
+    /**
+     * Returns the DataProvider Object for the tag
+     * @param tag The tag of the DataProvider
+     * @return The DataProvider with the given Tag
+     */
     public DataProvider getDataProvider(String tag)
     {
+        //TODO: check if the tag is valid or add to @return that it might return null
         return cameraList.get(tag);
     }
 
+    /**
+     * Returns every DataProvider that is loaded
+     * @return Every DataProvider that is loaded
+     */
     public List<DataProvider> getAllDataProviders()
     {
         return new LinkedList<>(cameraList.values());
     }
 
+    /**
+     * Returns every DataProvider which is enabled.
+     * @return All DataProviders that are enabled
+     */
     public List<DataProvider> getDataProviders()
     {
         List<DataProvider> providers = new LinkedList<>();
@@ -106,11 +163,17 @@ public class DataProviderManager extends Observable{
         return providers;
     }
 
-    public boolean isCameraNearerThan(float distance, Location lastLocation)
+    /**
+     * Checks if a camera is nearer than radius to referenceLocation
+     * @param radius The radius in which a camera will trigger around referenceLocation
+     * @param referenceLocation The Location which is used as reference to check for Cameras
+     * @return Whether a camera is in the radius radius of the Location referenceLocation
+     */
+    public boolean isCameraNearerThan(float radius, Location referenceLocation)
     {
         for (DataProvider provider : getDataProviders()) {
             if (provider.hasData()) {
-                if (provider.distanceToNearestCamera(lastLocation) < distance) {
+                if (provider.distanceToNearestCamera(referenceLocation) < radius) {
                     return true;
                 }
             }
@@ -118,6 +181,8 @@ public class DataProviderManager extends Observable{
         return false;
     }
 
+
+    //Loads the Data for the DataProviders and when it is loaded set the status to what was specified beforehand
     private class FillDataProviderTask extends AsyncTask<FillDataProviderTaskParams, Void, FillDataProviderTaskParams> {
 
         @Override
@@ -140,6 +205,7 @@ public class DataProviderManager extends Observable{
         }
     }
 
+    //Custom DataStructure to store both the DataProvider and it's tag in one object to pass it through the AsyncTask
     private static class FillDataProviderTaskParams {
         DataProvider provider;
         String tag;
