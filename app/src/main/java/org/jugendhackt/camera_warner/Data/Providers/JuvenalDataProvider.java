@@ -1,22 +1,16 @@
 package org.jugendhackt.camera_warner.Data.Providers;
 
-import android.location.Location;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jugendhackt.camera_warner.Data.Model.Camera;
-import org.jugendhackt.camera_warner.Utils.LocationUtils;
 import org.jugendhackt.camera_warner.Utils.NetworkUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-/**
- * Created by Julian Mundhahs on 10.06.2017.
- */
 
 /**
  * This DataProvider provides the data that is also available on juvenal.org.

@@ -1,16 +1,10 @@
 package org.jugendhackt.camera_warner.Data.Providers;
 
-import android.location.Location;
-
 import org.jugendhackt.camera_warner.Data.Model.Camera;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Created by Julian Mundhahs on 10.06.2017.
- */
 
 /**
  * This is just a DataProvider that provides *fake* and constant data. It should be used for test purposes only!

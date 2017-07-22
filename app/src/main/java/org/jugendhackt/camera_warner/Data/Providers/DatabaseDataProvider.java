@@ -15,10 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by Julian Mundhahs on 10.06.2017.
- */
-
-/**
  * This class provides data from local MySQL Database that is accessible via a php script.
  * It therefore is blocking.
  */

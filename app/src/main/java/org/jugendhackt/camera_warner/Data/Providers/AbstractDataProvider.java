@@ -14,16 +14,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by Julian Mundhahs on 18.06.2017.
+ * Provides a basic frame for coding a DataProvider. Only @see forceFetch which loads the Data synchronously has to be implemented.
  */
-
 public abstract class AbstractDataProvider implements DataProvider {
 
     //to avoid having to fetch the data every time
     private List<Camera> camerasCache = new LinkedList<>();
 
     /**
-     * Actually loads data from the data source
+     * Actually loads data from the data source. This is done synchronously
      * @return the data that has been loaded
      */
     protected abstract List<Camera> forceFetch();

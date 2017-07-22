@@ -6,9 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by Julian Mundhahs on 22.06.2017.
+ * A DataProvider that returns the Data given in the constructor. It is intended for testing.
  */
-
 public class TestingDataProvider extends AbstractDataProvider {
 
     private List<Camera> tempStorage;

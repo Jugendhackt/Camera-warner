@@ -7,16 +7,10 @@ import org.jugendhackt.camera_warner.Data.Model.Camera;
 import java.util.List;
 
 /**
- * Created by Julian Mundhahs on 10.06.2017.
- */
-
-/**
  * This class is a abstraction of a data provider.
  * Every data source that should be used should implement this.
  */
 public interface DataProvider {
-
-    //TODO: user Task<List<Camera> as type
 
     public void fetchData();
 
