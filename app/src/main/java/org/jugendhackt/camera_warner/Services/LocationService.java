@@ -55,15 +55,17 @@ public class LocationService extends Service implements Observer {
     //the last received location
     private Location lastLocation;
 
+    //manages all the DataProviders
     private DataProviderManager manager;
 
+    //keeps track whether the ongoing warning notification is shown
     private boolean notificationIsShown;
 
-    //This notification ID can be used to access our notification after we've displayed it. This
-    //can be handy when we need to cancel the notification, or perhaps update it. This number is
-    //arbitrary and can be set to whatever you like.
+    //the notification IDs can used to access the notification after it is display
+    //to update or cancel it
+    //the ongoing notification that warns the user of cameras
     private static final int CAMERA_WARNING_NOTIFICATION_ID = 1243;
-
+    //the ongoing notification that shows the user that the service is running und gives him the ability to control it
     private static final int CAMERA_FOREGROUND_SERVICE_NOTIFICATION_ID = 3421;
 
     @Override
@@ -89,22 +91,17 @@ public class LocationService extends Service implements Observer {
                         && manager.isCameraNearerThan(Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default))), lastLocation)) {
                     enableCameraWarning();
                 } else {
-                    disableCamerWarning();
+                    disableCameraWarning();
                 }
 
             }
         };
 
-        Notification notification =
-                prepareForegroundNotification()
-                        .setContentText(getString(R.string.service_foregroundNotification_text))
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText(getString(R.string.service_foregroundNotification_bigText)))
-                        .build();
-
-        startForeground(CAMERA_FOREGROUND_SERVICE_NOTIFICATION_ID, notification);
+        //build the notification for @see {@link #startForeground()} to keep the service from being killed
+        startForeground(CAMERA_FOREGROUND_SERVICE_NOTIFICATION_ID, buildForegroundNotification());
     }
 
-    private android.support.v4.app.NotificationCompat.Builder prepareForegroundNotification() {
+    private Notification buildForegroundNotification() {
         Intent startService = new Intent(this, LocationService.class);
         startService.setAction("START");
         PendingIntent startPendingIntent = PendingIntent.getService(this, 0, startService, 0);
@@ -127,7 +124,10 @@ public class LocationService extends Service implements Observer {
                         .addAction(startAction)
                         .setSmallIcon(android.R.drawable.ic_dialog_info)
                         .setContentTitle("LocationService")
-                        .setAutoCancel(true);
+                        .setAutoCancel(true)
+                        .setContentText(getString(R.string.service_foregroundNotification_text))
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(getString(R.string.service_foregroundNotification_bigText)))
+                        .build();
     }
 
     @Override
@@ -135,6 +135,7 @@ public class LocationService extends Service implements Observer {
 
         Log.d("LocationService", "onStartCommand");
 
+        //handle the actions (e.g. the stop from the foreground notification)
         switch (intent.getAction()) {
             case "STOP":
                 Log.d("LocationService", "stoping");
@@ -146,6 +147,7 @@ public class LocationService extends Service implements Observer {
                 break;
         }
 
+        //mark all DataProviders as enabled that are enabled by the user
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         Set<String> selections = preferences.getStringSet(getString(R.string.data_provider_key), null);
         manager.disableAll();
@@ -188,7 +190,7 @@ public class LocationService extends Service implements Observer {
             mClient.requestLocationUpdates(request, callback, null);
         }
 
-        // If we get killed, after returning from here, restart
+        //we shouldn't be killed because we are started as a foreground service
         return START_NOT_STICKY;
     }
 
@@ -203,31 +205,9 @@ public class LocationService extends Service implements Observer {
         super.onDestroy();
     }
 
-    private void notifyUIOfNewData() {
-        if (serviceCallbacks != null) {
-            serviceCallbacks.newData();
-        }
-    }
-
-    private void notifyUIOfNewPosition() {
-        if (serviceCallbacks != null && lastLocation != null) {
-            serviceCallbacks.positionUpdate();
-        }
-    }
-
-    private void disableCamerWarning() {
-        if (notificationIsShown) {
-            NotificationManager notificationManager = (NotificationManager)
-                    this.getSystemService(Context.NOTIFICATION_SERVICE);
-
-            notificationManager.cancel(CAMERA_WARNING_NOTIFICATION_ID);
-
-            notificationIsShown = false;
-        }
-    }
-
     /**
-     * Notifies the user that is a camera inside the radius of him that he defined
+     * Notifies the user that is a camera inside the radius of him that he defined.
+     * It is checked if the notification is already shown
      */
     private void enableCameraWarning() {
         if (!notificationIsShown) {
@@ -254,6 +234,20 @@ public class LocationService extends Service implements Observer {
             notificationManager.notify(CAMERA_WARNING_NOTIFICATION_ID, builder.build());
 
             notificationIsShown = true;
+        }
+    }
+
+    /**
+     * Removes the notification shown with @see {@link #enableCameraWarning()}
+     */
+    private void disableCameraWarning() {
+        if (notificationIsShown) {
+            NotificationManager notificationManager = (NotificationManager)
+                    this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+            notificationManager.cancel(CAMERA_WARNING_NOTIFICATION_ID);
+
+            notificationIsShown = false;
         }
     }
 
@@ -286,10 +280,6 @@ public class LocationService extends Service implements Observer {
         return binder;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        notifyUIOfNewData();
-    }
 
     public class LocalBinder extends Binder {
         public LocationService getService() {
@@ -297,6 +287,33 @@ public class LocationService extends Service implements Observer {
         }
     }
 
+    /**
+     * Wrapper to call the callback to the UI
+     */
+    private void notifyUIOfNewData() {
+        if (serviceCallbacks != null) {
+            serviceCallbacks.newData();
+        }
+    }
+
+    /**
+     * Wrapper to call the callback to the UI
+     */
+    private void notifyUIOfNewPosition() {
+        if (serviceCallbacks != null && lastLocation != null) {
+            serviceCallbacks.positionUpdate();
+        }
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        notifyUIOfNewData();
+    }
+
+    /**
+     * The UI can attach a Callback here to be notified when new Data is available or the location changed.
+     * @param serviceCallbacks The ServiceCallback (UI)
+     */
     public void setCallback(ServiceCallbacks serviceCallbacks) {
         this.serviceCallbacks = serviceCallbacks;
 
@@ -306,10 +323,18 @@ public class LocationService extends Service implements Observer {
         }
     }
 
+    /**
+     * Returns the last received Location for the UI. It will be called after the observer is notified of a change.
+     * @return The last received Location
+     */
     public Location getLastLocation() {
         return lastLocation;
     }
 
+    /**
+     * Returns all enabled DataProviders for the UI. It will be called after the observer was notified of a change.
+     * @return All enabled DataProviders for the UI
+     */
     public List<DataProvider> getProviders() {
         return manager.getDataProviders();
     }
