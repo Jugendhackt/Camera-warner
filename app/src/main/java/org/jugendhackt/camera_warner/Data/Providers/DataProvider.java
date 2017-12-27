@@ -12,6 +12,10 @@ import java.util.List;
  */
 public interface DataProvider {
 
+    /**
+     * Fetches and caches the data for the specified region.
+     * This may be done blocking.
+     */
     public void fetchData();
 
     /**
