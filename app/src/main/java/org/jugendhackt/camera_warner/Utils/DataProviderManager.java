@@ -2,7 +2,6 @@ package org.jugendhackt.camera_warner.Utils;
 
 import android.location.Location;
 import android.os.AsyncTask;
-import android.provider.ContactsContract;
 import android.util.Log;
 
 import org.jugendhackt.camera_warner.Data.Providers.DataProvider;
@@ -18,7 +17,9 @@ import java.util.Observable;
  *
  * Different DataProviders can be enabled or disabled to make the hiding of some DataProviders possible.
  */
-public class DataProviderManager extends Observable{
+public class DataProviderManager extends Observable {
+
+    //TODO: add method to be notified of location updates to pass it down to the single DataProviders
 
     //contains all the DataProviders
     private HashMap<String, DataProvider> cameraList;
@@ -50,6 +51,7 @@ public class DataProviderManager extends Observable{
     public void addDataProvider(DataProvider camera, String tag, boolean shouldBeActive)
     {
         cameraList.put(tag, camera);
+        isActive.put(tag, false);
 
         new FillDataProviderTask().execute(new FillDataProviderTaskParams(camera, tag));
     }
@@ -102,38 +104,53 @@ public class DataProviderManager extends Observable{
      */
     public boolean isEnabled(String tag)
     {
-        //TODO: check if the tag is valid
-        return isActive.get(tag);
+        //TODO: could theoretically throw npe if the mapping of tag is null, shouldn't be able to get null anyways (fix?)
+        return isActive.containsKey(tag) && isActive.get(tag);
     }
 
     /**
      * Enables the DataProvider with the specified tag
      * @param tag The tag of the DataProvider
+     * @return Whether the operation was successful (The DataProvider has to exist to be enabled.
      */
-    private void enable(String tag)
+    private boolean enable(String tag)
     {
-        //TODO: check if the tag is valid
-        isActive.put(tag, true);
+        if(isActive.containsKey(tag))
+        {
+            isActive.put(tag, true);
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
      * Disables the DataProvider with the specified tag
      * @param tag The tag of the DataProvider
+     * @return Whether the operation was successful (The DataProvider has to exist to be enabled.
      */
-    public void disable(String tag)
+    public boolean disable(String tag)
     {
-        //TODO: check if the tag is valid
-        isActive.put(tag, false);
+        if(isActive.containsKey(tag))
+        {
+            isActive.put(tag, false);
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
      * Returns the DataProvider Object for the tag
      * @param tag The tag of the DataProvider
      * @return The DataProvider with the given Tag
+     * @throws IllegalArgumentException If the tag doesn`t map to a DataProvider
      */
     public DataProvider getDataProvider(String tag)
     {
-        //TODO: check if the tag is valid or add to @return that it might return null
+        if(!cameraList.containsKey(tag)) throw new IllegalArgumentException("The specified key is not mapped to a DataProvider!");
         return cameraList.get(tag);
     }
 
