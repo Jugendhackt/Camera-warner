@@ -46,7 +46,7 @@ import java.util.Set;
  */
 public class LocationService extends Service implements Observer {
 
-    //the interval in which the service wishes to be notified of the users location (expected, min)
+    //the interval in which the service wishes to be notified of the users location (expected, min) in ms
     static int INTERVAL = 1000 * 15;
     static int FASTEST_INTERVAL = 1000 * 5;
     private FusedLocationProviderClient mClient;
@@ -85,6 +85,7 @@ public class LocationService extends Service implements Observer {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 lastLocation = locationResult.getLastLocation();
+                Log.d("LocationService", "new location received");
                 notifyUIOfNewPosition();
 
                 if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getString(R.string.pref_active_key), getResources().getBoolean(R.bool.pref_active_default))
