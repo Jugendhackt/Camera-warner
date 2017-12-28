@@ -31,12 +31,12 @@ dependencies {
     //better and flatter layout hierarchy type
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     //show a map and work with it
-    compile 'com.google.android.gms:play-services-maps:11.0.1'
+    compile 'com.google.android.gms:play-services-maps:11.8.0'
     compile 'com.google.maps.android:android-maps-utils:0.4.4'
     //access user's location
-    compile 'com.google.android.gms:play-services-location:11.0.1'
+    compile 'com.google.android.gms:play-services-location:11.8.0'
     //settings
-    compile 'com.android.support:preference-v14:25.3.1'
+    compile 'com.android.support:preference-v14:25.4.0'
     //networking
     compile 'com.squareup.okhttp3:okhttp:3.8.0'
 
