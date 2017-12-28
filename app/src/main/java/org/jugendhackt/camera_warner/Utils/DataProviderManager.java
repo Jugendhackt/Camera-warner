@@ -2,6 +2,7 @@ package org.jugendhackt.camera_warner.Utils;
 
 import android.location.Location;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import org.jugendhackt.camera_warner.Data.Providers.DataProvider;
@@ -19,27 +20,17 @@ import java.util.Observable;
  */
 public class DataProviderManager extends Observable {
 
-    //TODO: add method to be notified of location updates to pass it down to the single DataProviders
-
     //contains all the DataProviders
     private HashMap<String, DataProvider> cameraList;
     //contains which DataProvider is active
     private HashMap<String, Boolean> isActive;
 
+    private Location lastLocation;
+
     public DataProviderManager()
     {
         cameraList = new LinkedHashMap<>();
         isActive = new LinkedHashMap<>();
-    }
-
-    /**
-     * Wrapper for @see {@link #addDataProvider(DataProvider, String, boolean)} Note that the DataProvider will only be loaded but not enabled with this method.
-     * @param camera The DataProvider that should be added
-     * @param tag The tag which will be used for access to the DataProvider
-     */
-    private void addDataProvider(DataProvider camera, String tag)
-    {
-        addDataProvider(camera, tag, false);
     }
 
     /**
@@ -53,7 +44,7 @@ public class DataProviderManager extends Observable {
         cameraList.put(tag, camera);
         isActive.put(tag, false);
 
-        new FillDataProviderTask().execute(new FillDataProviderTaskParams(camera, tag));
+        new FillDataProviderTask().execute(new FillDataProviderTaskParams(camera, tag, shouldBeActive, lastLocation));
     }
 
     /**
@@ -61,7 +52,7 @@ public class DataProviderManager extends Observable {
      * @param provider The DataProvider to be loaded and enabled
      * @param tag The tag which will be used for access to the DataProvider
      */
-    public void add(DataProvider provider, String tag)
+    public void addDataProvider(DataProvider provider, String tag)
     {
         if(!cameraList.containsKey(tag))
         {
@@ -113,7 +104,7 @@ public class DataProviderManager extends Observable {
      * @param tag The tag of the DataProvider
      * @return Whether the operation was successful (The DataProvider has to exist to be enabled.
      */
-    private boolean enable(String tag)
+    public boolean enable(String tag)
     {
         if(isActive.containsKey(tag))
         {
@@ -198,6 +189,16 @@ public class DataProviderManager extends Observable {
         return false;
     }
 
+    public void onLocationChanged(@NonNull Location newLocation)
+    {
+        Log.d("DataProviderManager", "newLocation received");
+        lastLocation = newLocation;
+
+        for(String providerTag : cameraList.keySet())
+        {
+            new FillDataProviderTask().execute(new FillDataProviderTaskParams(cameraList.get(providerTag), providerTag, false, lastLocation));
+        }
+    }
 
     //Loads the Data for the DataProviders and when it is loaded set the status to what was specified beforehand
     private class FillDataProviderTask extends AsyncTask<FillDataProviderTaskParams, Void, FillDataProviderTaskParams> {
@@ -207,16 +208,16 @@ public class DataProviderManager extends Observable {
             FillDataProviderTaskParams taskParams = params[0];
             DataProvider provider = taskParams.provider;
 
-            provider.fetchData();
+            provider.updateLocation(taskParams.loc);
             return taskParams;
         }
 
         @Override
-        protected void onPostExecute(FillDataProviderTaskParams provider) {
-            super.onPostExecute(provider);
+        protected void onPostExecute(FillDataProviderTaskParams param) {
+            super.onPostExecute(param);
 
-            enable(provider.tag);
-            Log.d("DataProviderManager", "loaded: " + provider.tag);
+            if(param.shouldBeActive) enable(param.tag);
+            Log.d("DataProviderManager", "loaded: " + param.tag);
             setChanged();
             notifyObservers();
         }
@@ -226,11 +227,15 @@ public class DataProviderManager extends Observable {
     private static class FillDataProviderTaskParams {
         DataProvider provider;
         String tag;
+        Boolean shouldBeActive;
+        Location loc;
 
-        FillDataProviderTaskParams(DataProvider dataProvider, String strTag)
+        FillDataProviderTaskParams(DataProvider dataProvider, String strTag, boolean getActivated, Location location)
         {
             provider = dataProvider;
             tag = strTag;
+            shouldBeActive = getActivated;
+            loc = location;
         }
     }
 
