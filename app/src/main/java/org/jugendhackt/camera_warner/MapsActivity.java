@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -34,7 +35,7 @@ import org.jugendhackt.camera_warner.Data.Providers.DataProvider;
 import org.jugendhackt.camera_warner.Preferences.SettingsActivity;
 import org.jugendhackt.camera_warner.Services.LocationService;
 
-import java.util.List;
+import java.util.Set;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, ServiceCallbacks {
 
@@ -156,6 +157,30 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         radiusCircle = mMap.addCircle(new CircleOptions().center(locationMarker.getPosition()).radius(Double.parseDouble(PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default)))).fillColor(Color.argb(195, 102, 147, 173)));
     }
 
+    private void redrawLocationOnMap()
+    {
+        if(locationMarker!=null)
+        {
+            LatLng markerLocation = locationMarker.getPosition();
+
+            if (!followed) {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(markerLocation, 15));
+                followed = true;
+            }
+
+            locationMarker = mMap.addMarker(new MarkerOptions().position(markerLocation).title("Your location"));
+
+            if (radiusCircle != null) {
+                radiusCircle.remove();
+            }
+            radiusCircle = mMap.addCircle(new CircleOptions().center(locationMarker.getPosition()).radius(Double.parseDouble(PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default)))).fillColor(Color.argb(195, 102, 147, 173)));
+        }
+        else
+        {
+            Log.d("MapsActivity", "redrawLocationOnMap called with null==locationMarker");
+        }
+    }
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -184,7 +209,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void addData(List<Camera> data) {
+    private void addData(Set<Camera> data) {
         myClusterManager.addItems(data);
     }
 
@@ -207,6 +232,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         {
             addData(provider.getAllCameras());
         }
+
+        myClusterManager.cluster();
+        redrawLocationOnMap();
     }
 
     @Override
