@@ -4,7 +4,7 @@ import android.location.Location;
 
 import org.jugendhackt.camera_warner.Data.Model.Camera;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * This class provides some wrappers for functions concerning the comparison of two locations
@@ -19,12 +19,12 @@ public class LocationUtils {
      * @param cameras a list of cameras out of which the nearest will be returned
      * @return the camera nearest to the location
      */
-    public static Camera getNearestTo(double latitude, double longitude, List<Camera> cameras)
+    public static Camera getNearestTo(double latitude, double longitude, Set<Camera> cameras)
     {
         float[] result = new float[3];
 
         float distance = Float.MAX_VALUE;
-        Camera nearest = cameras.get(0);
+        Camera nearest = null;
 
         for (Camera camera : cameras) {
             Location.distanceBetween(latitude, longitude, camera.getLatitude(), camera.getLongitude(), result);
@@ -39,12 +39,12 @@ public class LocationUtils {
     }
 
     /**
-     * Wrapper  for {@link #getNearestTo(double, double, List)}
+     * Wrapper  for {@link #getNearestTo(double, double, Set)}
      * @param location the location to which the nearest camera will be returned
      * @param cameras a list of cameras out which the nearest will be returned
      * @return the nearst camera
      */
-    public static Camera getNearestTo(Location location, List<Camera> cameras)
+    public static Camera getNearestTo(Location location, Set<Camera> cameras)
     {
         return getNearestTo(location.getLatitude(), location.getLongitude(), cameras);
     }
@@ -91,7 +91,7 @@ public class LocationUtils {
     }
 
     /**
-     * A wrapper for {@link #getNearestTo(double, double, List)}
+     * A wrapper for {@link #getNearestTo(double, double, Set)}
      * @param location the 1st location
      * @param camera the camera (2nd location)
      * @return the distance between the 1st location and the camera
