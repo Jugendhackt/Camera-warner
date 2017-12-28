@@ -4,7 +4,7 @@ import android.location.Location;
 
 import org.jugendhackt.camera_warner.Data.Model.Camera;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * This class is a abstraction of a data provider.
@@ -13,22 +13,16 @@ import java.util.List;
 public interface DataProvider {
 
     /**
-     * Fetches and caches the data for the specified region.
-     * This may be done blocking.
-     */
-    public void fetchData();
-
-    /**
      * Check if data has been cached
      * @return if data is cached
      */
     public boolean hasData();
 
     /**
-     * This Method should return all the cameras the data source has available as a list
-     * @return a list of all the available cameras
+     * This Method should return all the cameras the data source has available as a Set
+     * @return a Set of all the available cameras
      */
-    public List<Camera> getAllCameras();
+    public Set<Camera> getAllCameras();
 
     /**
      * Only get the camera that is nearest to the specified location
@@ -51,6 +45,14 @@ public interface DataProvider {
      * @param radius the radius in meters in which the cameras will be returned
      * @return the cameras in the radius from the location
      */
-    public List<Camera> getCamerasInRange(double latitude, double longitude, int radius);
+    public Set<Camera> getCamerasInRange(double latitude, double longitude, int radius);
+
+    /**
+     * Notifies the DataProvider that the users location has changed.
+     * This is important because the it may need the location to know for which location Data should be loaded
+     * and also if the user moves out of the previous search location.
+     * @param newLocation the new location of the user
+     */
+    public Set<Camera> updateLocation(Location newLocation);
 
 }
