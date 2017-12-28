@@ -9,23 +9,28 @@ import org.json.JSONObject;
 import org.jugendhackt.camera_warner.Data.Model.Camera;
 import org.jugendhackt.camera_warner.Utils.NetworkUtils;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Locale;
+import java.util.Set;
 
 public class OSMDataProvider extends AbstractDataProvider {
 
     private static final String URL = "http://overpass-api.de/api/interpreter";
-    private static final String staticQuery = "[out:json][timeout:25];\n\n(area[name=\"Hamburg\"];)->.a; \n\n(node[\"man_made\"=\"surveillance\"](area.a));\nout body;";
-    private static final String queryTemplate = "[out:json][timeout:25];\n\n(node[\"man_made\"=\"surveillance\"](%f, %f, %f, %f));\nout body;";
+    private static final String queryTemplate = "[out:json][timeout:25];\n\n(node[\"man_made\"=\"surveillance\"](%2.2f, %2.2f, %2.2f, %2.2f));\nout body;";
 
     @Override
-    protected List<Camera> forceFetch() {
-        return executeAndFetchFromQuery(staticQuery);
+    public Set<Camera> loadData(Location newLocation) {
+        if(newLocation==null)
+        {
+            Log.d("OSMDataProvider", "location is null. ignoring");
+            return new LinkedHashSet<>();
+        }
+
+        Log.d("OSMDataProvider", String.format("Fetching data for Latitude=%f, Longitude=%f", newLocation.getLatitude(), newLocation.getLongitude()));
+        return fetchForLocation(newLocation);
     }
 
-    private List<Camera> executeAndFetchFromQuery(String query)
+    private Set<Camera> executeAndFetchFromQuery(String query)
     {
         JSONArray result = new JSONArray();
         String resultStr = NetworkUtils.getResponseWithPost(URL, NetworkUtils.OverpassQL, query);
@@ -33,7 +38,7 @@ public class OSMDataProvider extends AbstractDataProvider {
         if(resultStr == null || resultStr.length() == 0)
         {
             Log.d("OSMDataProvider", "fetch failed");
-            return new LinkedList<>();
+            return new LinkedHashSet<>();
         }
 
         try {
@@ -41,7 +46,7 @@ public class OSMDataProvider extends AbstractDataProvider {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        List<Camera> cameras = new ArrayList<>(result.length());
+        Set<Camera> cameras = new LinkedHashSet<>(result.length());
         for (int i = 0; i < result.length(); i++) {
             JSONObject coordinates = null;
             try {
@@ -55,7 +60,7 @@ public class OSMDataProvider extends AbstractDataProvider {
         return cameras;
     }
 
-    protected List<Camera> fetchForLocation(Location location)
+    protected Set<Camera> fetchForLocation(Location location)
     {
         return executeAndFetchFromQuery(formatQuery(location));
     }
@@ -65,13 +70,8 @@ public class OSMDataProvider extends AbstractDataProvider {
         return String.format(Locale.US, queryTemplate, x1, y1, x2, y2);
     }
 
-    private String formatQuery(Location loc1, Location loc2)
-    {
-        return formatQuery(loc1.getAltitude(), loc1.getLatitude(), loc2.getAltitude(), loc2.getLatitude());
-    }
-
     private String formatQuery(Location location)
     {
-        return formatQuery(location.getAltitude()-0.05, location.getLatitude()-0.5, location.getAltitude()+0.05, location.getLatitude()+0.5);
+        return formatQuery(location.getLatitude()-0.05, location.getLongitude()-0.05, location.getLatitude()+0.05, location.getLongitude()+0.05);
     }
 }
