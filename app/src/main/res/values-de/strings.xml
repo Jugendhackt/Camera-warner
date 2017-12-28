@@ -11,7 +11,7 @@
     <string name="pref_active_summary_on">Sie werden benachrichtigt, wenn Sie in der Nähe einer Kamera sind</string>
     <string name="title_activity_maps">Kameras</string>
     <string name="title_activity_settings">Einstellungen</string>
-    <string name="pref_radius_label" translatable="false">Radius</string>
+    <string name="pref_radius_label">Radius</string>
     <string name="pref_active_label">Benachrichtigungen senden</string>
     <string name="data_provider_juvenal">Juvenal.org Daten</string>
     <string name="app_name">Kamera Warner</string>
