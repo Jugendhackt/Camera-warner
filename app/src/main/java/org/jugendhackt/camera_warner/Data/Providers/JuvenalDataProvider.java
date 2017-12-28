@@ -1,5 +1,6 @@
 package org.jugendhackt.camera_warner.Data.Providers;
 
+import android.location.Location;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -8,9 +9,8 @@ import org.json.JSONObject;
 import org.jugendhackt.camera_warner.Data.Model.Camera;
 import org.jugendhackt.camera_warner.Utils.NetworkUtils;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * This DataProvider provides the data that is also available on juvenal.org.
@@ -25,14 +25,14 @@ public class JuvenalDataProvider extends AbstractDataProvider{
      * @return the data that has been loaded
      */
     @Override
-    protected List<Camera> forceFetch() {
+    protected Set<Camera> loadData(Location location) {
         JSONArray result = new JSONArray();
         String resultStr = NetworkUtils.getResponseFromURL(URL, NetworkUtils.GeoJSON);
 
         if(resultStr == null || resultStr.length() == 0)
         {
             Log.d("JuvenalDataProvider", "fetch failed");
-            return new LinkedList<>();
+            return new LinkedHashSet<>();
         }
 
         try {
@@ -40,7 +40,7 @@ public class JuvenalDataProvider extends AbstractDataProvider{
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        List<Camera> cameras = new ArrayList<>(result.length());
+        Set<Camera> cameras = new LinkedHashSet<>(result.length());
         for (int i = 0; i < result.length(); i++) {
             JSONArray coordinates = null;
             try {
@@ -52,5 +52,14 @@ public class JuvenalDataProvider extends AbstractDataProvider{
             }
         }
         return cameras;
+    }
+
+    @Override
+    public Set<Camera> updateLocation(Location newLocation) {
+        if(camerasCache.isEmpty())
+        {
+            camerasCache.addAll(loadData(newLocation));
+        }
+        return camerasCache;
     }
 }
