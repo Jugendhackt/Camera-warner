@@ -47,8 +47,8 @@ import java.util.Set;
 public class LocationService extends Service implements Observer {
 
     //the interval in which the service wishes to be notified of the users location (expected, min) in ms
-    static int INTERVAL = 1000 * 15;
-    static int FASTEST_INTERVAL = 1000 * 5;
+    static int INTERVAL = 1000 * 30;
+    static int FASTEST_INTERVAL = 1000 * 15;
     private FusedLocationProviderClient mClient;
     //called for the location updates; needed to properly unregister the callback
     private LocationCallback callback;
@@ -87,6 +87,8 @@ public class LocationService extends Service implements Observer {
                 lastLocation = locationResult.getLastLocation();
                 Log.d("LocationService", "new location received");
                 notifyUIOfNewPosition();
+                //update the location providers with the new location
+                manager.onLocationChanged(lastLocation);
 
                 if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getString(R.string.pref_active_key), getResources().getBoolean(R.bool.pref_active_default))
                         && manager.isCameraNearerThan(Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getString(R.string.pref_radius_key), getString(R.string.pref_radius_default))), lastLocation)) {
@@ -163,7 +165,7 @@ public class LocationService extends Service implements Observer {
                 } else if (string.equals(getString(R.string.data_provider_osm_values))) {
                     provider = new OSMDataProvider();
                 }
-                manager.add(provider, string);
+                manager.addDataProvider(provider, string, true);
             }
         }
         notifyUIOfNewData();
@@ -183,6 +185,7 @@ public class LocationService extends Service implements Observer {
                             if (location != null) {
                                 lastLocation = location;
                                 notifyUIOfNewPosition();
+                                manager.onLocationChanged(lastLocation);
                             }
                         }
                     });
@@ -293,6 +296,7 @@ public class LocationService extends Service implements Observer {
      */
     private void notifyUIOfNewData() {
         if (serviceCallbacks != null) {
+            Log.d("LocationService", "notifying UI of new data");
             serviceCallbacks.newData();
         }
     }
@@ -302,6 +306,7 @@ public class LocationService extends Service implements Observer {
      */
     private void notifyUIOfNewPosition() {
         if (serviceCallbacks != null && lastLocation != null) {
+            Log.d("LocationService", "notifying UI of new location");
             serviceCallbacks.positionUpdate();
         }
     }
