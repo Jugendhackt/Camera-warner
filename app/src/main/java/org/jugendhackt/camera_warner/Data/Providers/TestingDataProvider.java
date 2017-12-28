@@ -1,33 +1,33 @@
 package org.jugendhackt.camera_warner.Data.Providers;
 
+import android.location.Location;
+
 import org.jugendhackt.camera_warner.Data.Model.Camera;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * A DataProvider that returns the Data given in the constructor. It is intended for testing.
  */
 public class TestingDataProvider extends AbstractDataProvider {
 
-    private List<Camera> tempStorage;
+    private Set<Camera> tempStorage;
 
-    public TestingDataProvider(List<Camera> data)
+    public TestingDataProvider(Set<Camera> data)
     {
         tempStorage = data;
     }
 
     public TestingDataProvider(Camera[] data)
     {
-        tempStorage = new LinkedList<>();
-        for(Camera camera : data)
-        {
-            tempStorage.add(camera);
-        }
+        tempStorage = new LinkedHashSet<>();
+        tempStorage.addAll(Arrays.asList(data));
     }
 
     @Override
-    protected List<Camera> forceFetch() {
+    protected Set<Camera> loadData(Location location) {
         return tempStorage;
     }
 }
